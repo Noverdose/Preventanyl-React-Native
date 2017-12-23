@@ -18,7 +18,43 @@ export default class MapComponent extends Component {
                     description : "Marker",
                 }
             ],
+            userLocation : { 
+                latlng : {
+                    latitude: null,
+                    longitude: null,
+                },
+                error       : null,
+            }
         }
+    }
+
+    componentDidMount () {
+        this.watchId = navigator.geolocation.watchPosition (
+            (position) => {
+                this.setState ({
+                    userLocation : {
+                        latlng : {
+                            latitude  : position.coords.latitude,
+                            longitude : position.coords.longitude,
+                        },
+                        error     : null,
+                    }
+                });
+            },
+            (error) => this.setState ( {
+                error : error.message
+            }),
+            { 
+                enableHighAccuracy : true,
+                timeout : 20000,
+                maximumAge : 1000,
+                distanceFilter : 10
+            }
+        );
+    }
+
+    componentWillUnmount () {
+        navigator.geolocation.clearWatch (this.watchId);
     }
 
     getInitialState() {
@@ -29,13 +65,6 @@ export default class MapComponent extends Component {
             longitudeDelta: 0.0421,
         };
       }
-      
-
-    onRegionChange (region) {
-        this.setState ({
-            region
-        })
-    }
 
     helpMe () {
         Alert.alert (
@@ -56,16 +85,13 @@ export default class MapComponent extends Component {
         return (
             <View style = { styles.container }>
                 <MapView 
-                    style = { styles.map }
-                    region = { this.state.region }
-                    onRegionChange = { () => { this.onRegionChange } } >
-                    { this.state.markers.map (marker => (
-                        <MapView.Marker
-                            coordinate  = { marker.latlng }
-                            title       = { marker.title }
-                            description = { marker.description } 
-                            key         = { marker.latlng } />
-                    ))}
+                    style = { styles.map } >
+                    { this.state.userLocation.latlng.latitude != null && this.state.userLocation.latlng.longitude != null &&
+                        <MapView.Marker 
+                            coordinate  = { this.state.userLocation.latlng } 
+                            title       = "Current position"
+                            description = "You are here" />
+                    }
                 </MapView>
                 <TouchableOpacity
                     style = { styles.helpme }
