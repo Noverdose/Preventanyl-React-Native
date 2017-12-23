@@ -20,10 +20,10 @@ export default class MapComponent extends Component {
             ],
             userLocation : { 
                 latlng : {
-                    latitude: null,
-                    longitude: null,
+                    latitude  : null,
+                    longitude : null,
                 },
-                error       : null,
+                error : null,
             }
         }
     }

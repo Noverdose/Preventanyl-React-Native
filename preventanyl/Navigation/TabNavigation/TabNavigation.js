@@ -1,19 +1,19 @@
 import React from 'react';
-import { AppRegistry, Text, View, Image, StyleSheet} from 'react-native';
 import { TabNavigator } from 'react-navigation';
+import { Text, View, Image, StyleSheet } from 'react-native';
 
-import MapComponent from './Components/MapComponent/MapComponent'
-import ProfileComponent from './Components/ProfileComponent/ProfileComponent'
-import RegisterComponent from './Components/RegisterComponent/RegisterComponent'
+import MapComponent from '../../Components/MapComponent/MapComponent'
+import ProfileComponent from '../../Components/ProfileComponent/ProfileComponent'
+import RegisterComponent from '../../Components/RegisterComponent/RegisterComponent'
 
-const RootNavigator = TabNavigator ({
+const TabNavigation = TabNavigator ({
   Map : {
     screen : MapComponent,
     navigationOptions : {
       tabBarLabel : 'Home',
       tabBarIcon  : ({ tintColor }) => (
         <Image 
-          source = { require ('./assets/map.imageset/map.png') }
+          source = { require ('../../assets/map.imageset/map.png') }
           style  = { [styles.icon, { tintColor : tintColor }]}
         />
       )
@@ -25,7 +25,7 @@ const RootNavigator = TabNavigator ({
       tabBarLabel : 'Profile',
       tabBarIcon  : ({ tintColor }) => (
         <Image 
-          source = { require ('./assets/profile.imageset/user_male.png') }
+          source = { require ('../../assets/profile.imageset/user_male.png') }
           style  = { [styles.icon, { tintColor : tintColor }]}
         />
       )
@@ -35,9 +35,13 @@ const RootNavigator = TabNavigator ({
     screen : RegisterComponent,
     navigationOptions : {
       tabBarLabel : 'Register',
-      tabBarIcon  : ({ tintColor }) => (
+      tabBarIcon  : (
+        { 
+          tintColor 
+        }
+        ) => (
         <Image 
-          source = { require ('./assets/address-book.imageset/address_book.png') }
+          source = { require ('../../assets/address-book.imageset/address_book.png') }
           style  = { [styles.icon, { tintColor : tintColor }]}
         />
       )
@@ -51,15 +55,6 @@ const RootNavigator = TabNavigator ({
   },
 });
 
-
-export default class App extends React.Component {
-  render() {
-    return (
-      <RootNavigator />
-    );
-  }
-}
-
 const styles = StyleSheet.create({
   icon: {
     width: 26,
@@ -67,4 +62,4 @@ const styles = StyleSheet.create({
   },
 });
 
-AppRegistry.registerComponent ('App', () => App);
+export default TabNavigation;
