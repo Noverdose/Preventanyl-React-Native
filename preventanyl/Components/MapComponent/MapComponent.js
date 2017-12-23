@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { AppRegistry, Text, View, StyleSheet } from 'react-native';
+import { AppRegistry, Text, View, Button, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import MapView from 'react-native-maps';
 
 export default class MapComponent extends Component {
@@ -19,8 +19,6 @@ export default class MapComponent extends Component {
                 }
             ],
         }
-
-        console.log (this.state);
     }
 
     getInitialState() {
@@ -39,6 +37,21 @@ export default class MapComponent extends Component {
         })
     }
 
+    helpMe () {
+        Alert.alert (
+            'Title',
+            'Message',
+            [
+                {
+                    text : 'Notify Angels', onPress : () => console.log ('Notifying Angels')
+                },
+            ],
+            { 
+                cancelable : false
+            }
+        );
+    }
+
     render () {
         return (
             <View style = { styles.container }>
@@ -54,6 +67,12 @@ export default class MapComponent extends Component {
                             key         = { marker.latlng } />
                     ))}
                 </MapView>
+                <TouchableOpacity
+                    style = { styles.helpme }
+                    onPress = { this.helpMe }
+                    underlayColor = '#fff'>
+                    <Text style = { styles.helpmeText }>Help Me</Text>
+                </TouchableOpacity>
             </View>
         );
     }
@@ -63,16 +82,24 @@ export default class MapComponent extends Component {
 const styles = StyleSheet.create ({
     container : {
         flex : 1,
-        justifyContent : 'center',
-        alignItems : 'center',
-        backgroundColor : '#F5FCFF'
+        backgroundColor : '#F5FCFF',
+        flexDirection : 'column',
     },
     map : {
-        position : 'absolute',
-        top    : 0,
-        left   : 0,
-        right  : 0,
-        bottom : 0
+        flex : 12,
+    },
+    helpme : {
+        flex : 1,
+        backgroundColor : '#8b0000',
+    },
+    helpmeText : {
+        color:'#fff',
+        textAlign:'center',
+        fontWeight: 'bold',
+        paddingLeft : 10,
+        paddingRight : 10,
+        paddingTop : 10,
+        paddingBottom : 10
     }
 })
 
