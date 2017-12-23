@@ -8,7 +8,7 @@ export default class MapComponent extends Component {
         super ();
         this.state = {
             region : this.getInitialState (),
-            markers : null,
+            markers : {},
         }
 
         console.log (this.state);
