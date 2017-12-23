@@ -8,7 +8,16 @@ export default class MapComponent extends Component {
         super ();
         this.state = {
             region : this.getInitialState (),
-            markers : {},
+            markers : [
+                {
+                    latlng : {
+                        latitude: 37.78825,
+                        longitude: -122.4324,
+                    },
+                    title : "Marker",
+                    description : "Marker",
+                }
+            ],
         }
 
         console.log (this.state);
@@ -41,7 +50,8 @@ export default class MapComponent extends Component {
                         <MapView.Marker
                             coordinate  = { marker.latlng }
                             title       = { marker.title }
-                            description = { marker.description } />
+                            description = { marker.description } 
+                            key         = { marker.latlng } />
                     ))}
                 </MapView>
             </View>
