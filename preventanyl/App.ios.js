@@ -1,6 +1,5 @@
 import React from 'react';
 import { AppRegistry } from 'react-native';
-import { TabNavigator } from 'react-navigation';
 
 import TabNavigation from './Navigation/TabNavigation/TabNavigation';
 
