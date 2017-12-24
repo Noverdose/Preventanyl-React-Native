@@ -2,11 +2,11 @@ import React from 'react'
 import { Text, Animated, Easing } from 'react-native'
 import { StackNavigator, DrawerNavigator } from 'react-navigation'
 
-import MapComponent from '../Components/MapComponent/MapComponent'
-import ProfileComponent from '../Components/ProfileComponent/ProfileComponent'
-import RegisterComponent from '../Components/RegisterComponent/RegisterComponent'
+import MapComponent from '../../Components/MapComponent/MapComponent'
+import ProfileComponent from '../../Components/ProfileComponent/ProfileComponent'
+import RegisterComponent from '../../Components/RegisterComponent/RegisterComponent'
 
-import DrawerContainer from '../Containers/DrawerContainer'
+import DrawerContainer from '../../Containers/DrawerContainer'
 
 // https://github.com/react-community/react-navigation/issues/1254
 const noTransitionConfig = () => ({

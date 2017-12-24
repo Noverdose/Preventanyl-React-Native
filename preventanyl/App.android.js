@@ -6,7 +6,7 @@ import { Provider } from 'react-redux';
 import createStore from './Redux'
 
 // We're going to use navigation with redux
-import ReduxNavigation from './Navigation/ReduxNavigation'
+import ReduxNavigation from './Navigation/DrawerNavigation/ReduxNavigation'
 
 // create our store
 const store = createStore()
