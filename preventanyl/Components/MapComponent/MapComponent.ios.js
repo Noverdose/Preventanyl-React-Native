@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
-import { AppRegistry, Text, View, Button, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { AppRegistry, Text, View, Button, TouchableOpacity, Alert, StyleSheet, Linking } from 'react-native';
 import MapView from 'react-native-maps';
+import * as firebase from 'firebase';
+
+import Database from '../../Database/Database'
 
 export default class MapComponent extends Component {
 
     constructor () {
         super ();
+
+        this.getInitialView ();
+
         this.state = {
             region : this.getInitialState (),
             markers : [
@@ -24,8 +30,25 @@ export default class MapComponent extends Component {
                     longitude : null,
                 },
                 error : null,
-            }
+            },
+            userLoaded  : false,
+            initialView : false,
         }
+
+        this.getInitialView = this.getInitialView.bind(this);
+    }
+
+    getInitialView () {
+
+        firebase.auth ().onAuthStateChanged ( (user) => {
+            let initialView = user ? "Home" : "Login";
+
+            this.setState ({
+                userLoaded  : true,
+                initialView : initialView
+            })
+        })
+
     }
 
     componentDidMount () {
@@ -51,6 +74,29 @@ export default class MapComponent extends Component {
                 distanceFilter : 10
             }
         );
+
+        Database.listenStaticKits ((kits) => {
+            let staticKits = [];
+            for (let kit of kits) {
+                staticKits.push ({
+                    title : kit.displayName,
+                    description : kit.comments,
+                    latlng : {
+                        latitude : kit.coordinates.lat,
+                        longitude : kit.coordinates.long,
+                    },
+                    id : kit.id,
+                    key : kit.id
+                })
+            }
+            
+            this.setState ({
+                markers : staticKits
+            });
+
+            console.log (staticKits);
+        });
+
     }
 
     componentWillUnmount () {
@@ -91,6 +137,30 @@ export default class MapComponent extends Component {
                             coordinate  = { this.state.userLocation.latlng } 
                             title       = "Current position"
                             description = "You are here" />
+                    }
+
+                    {
+                        this.state.markers &&
+                        this.state.markers.map ((marker, index) => (
+                            <MapView.Marker
+                                key         = { index }
+                                coordinate  = { marker.latlng }
+                                title       = { marker.title }
+                                description = { marker.description } >
+                                <MapView.Callout>
+                                    <Text>{ marker.title }</Text>
+                                    <Text>{ marker.description }</Text>
+                                    <TouchableOpacity onPress = { () => {
+                                        let url = `http://maps.apple.com/?saddr=${ this.state.userLocation.latlng.latitude },${ this.state.userLocation.latlng.longitude }&daddr=${ marker.latlng.latitude },${ marker.latlng.longitude }`;
+                                        console.log (url);
+                                        if (Linking.canOpenURL (url))
+                                            Linking.openURL (url);
+                                     } } style={ [ styles.bubble, styles.button ] }>
+                                      <Text>Directions</Text>
+                                    </TouchableOpacity>
+                                </MapView.Callout>
+                            </MapView.Marker>
+                        ))
                     }
                 </MapView>
                 <TouchableOpacity

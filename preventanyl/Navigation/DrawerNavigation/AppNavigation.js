@@ -4,7 +4,7 @@ import { StackNavigator, DrawerNavigator } from 'react-navigation'
 
 import MapComponent from '../../Components/MapComponent/MapComponent'
 import ProfileComponent from '../../Components/ProfileComponent/ProfileComponent'
-import RegisterComponent from '../../Components/RegisterComponent/RegisterComponent'
+import LoginComponent from '../../Components/LoginComponent/LoginComponent'
 
 import DrawerContainer from '../../Containers/DrawerContainer'
 
@@ -20,7 +20,7 @@ const noTransitionConfig = () => ({
 // drawer stack
 const DrawerStack = DrawerNavigator({
   screen1: { screen: MapComponent },
-  screen2: { screen: RegisterComponent },
+  screen2: { screen: LoginComponent },
   screen3: { screen: ProfileComponent },
 }, {
   gesturesEnabled: false,

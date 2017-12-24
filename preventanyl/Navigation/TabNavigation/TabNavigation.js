@@ -4,7 +4,7 @@ import { Text, View, Image, StyleSheet } from 'react-native';
 
 import MapComponent from '../../Components/MapComponent/MapComponent'
 import ProfileComponent from '../../Components/ProfileComponent/ProfileComponent'
-import RegisterComponent from '../../Components/RegisterComponent/RegisterComponent'
+import LoginComponent from '../../Components/LoginComponent/LoginComponent'
 
 const TabNavigation = TabNavigator ({
   Map : {
@@ -32,9 +32,9 @@ const TabNavigation = TabNavigator ({
     },
   },
   Register : {
-    screen : RegisterComponent,
+    screen : LoginComponent,
     navigationOptions : {
-      tabBarLabel : 'Register',
+      tabBarLabel : 'Login',
       tabBarIcon  : (
         { 
           tintColor 
