@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { AppRegistry, View, Text, TextInput, TouchableOpacity, StatusBar, StyleSheet } from 'react-native';
 
+import Database from '../../Database/Database';
+
 export default class LoginForm extends Component {
 
     constructor () {
@@ -15,6 +17,7 @@ export default class LoginForm extends Component {
         const { username, password } = this.state;
         console.log (username);
         console.log (password);
+        Database.login (username, password);
     }
 
     render () {
