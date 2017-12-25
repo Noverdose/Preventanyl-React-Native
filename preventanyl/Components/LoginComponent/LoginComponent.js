@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { AppRegistry, Text, View, Image, KeyboardAvoidingView, StyleSheet } from 'react-native';
+import { AppRegistry, Text, View, Image, KeyboardAvoidingView, StyleSheet, TouchableWithoutFeedback } from 'react-native';
+import DismissKeyboard from 'dismissKeyboard';
 
 import LoginForm from './LoginForm';
 
@@ -8,15 +9,20 @@ export default class LoginComponent extends Component {
   render () {
     return (
       <KeyboardAvoidingView behavior = 'padding' style = { styles.container }>
-          <View style = { styles.logoContainer }>
-              <Image 
-                style = { styles.logo }
-                source = { require ('../../assets/images/logo/app-store.png') } />
-                <Text style = { styles.title }>An app made for preventing overdoses using React-Native</Text>
-          </View>
-          <View style = { styles.formContainer }>
-              <LoginForm />
-          </View>
+
+        <TouchableWithoutFeedback onPress = { () => { DismissKeyboard() } }>
+            <View style = { styles.logoContainer }>
+                <Image 
+                  style = { styles.logo }
+                  source = { require ('../../assets/images/logo/app-store.png') } />
+                  <Text style = { styles.title }>An app made for preventing overdoses using React-Native</Text>
+            </View>
+        </TouchableWithoutFeedback>
+        <TouchableWithoutFeedback onPress = { () => { DismissKeyboard() } }>
+            <View style = { styles.formContainer }>
+                <LoginForm />
+            </View>
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     );
   }
