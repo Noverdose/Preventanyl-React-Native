@@ -21,7 +21,7 @@ const TabNavigation = TabNavigator ({
     },
   },
   Profile : {
-    screen : ProfileComponent,
+    screen : LoginComponent,
     navigationOptions : {
       tabBarLabel : 'Profile',
       tabBarIcon  : ({ tintColor }) => (
