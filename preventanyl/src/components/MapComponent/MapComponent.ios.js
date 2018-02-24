@@ -4,7 +4,7 @@ import MapView from 'react-native-maps';
 import Timestamp from 'react-timestamp';
 import * as firebase from 'firebase';
 
-import Database from '../../Database/Database'
+import Database from '../../database/Database'
 
 export default class MapComponent extends Component {
 
@@ -194,7 +194,7 @@ export default class MapComponent extends Component {
                     underlayColor = '#fff'>
                     <Image 
                         source = {
-                            require('../../assets/location.imageset/define_location.png')
+                            require('../../../assets/location.imageset/define_location.png')
                         }
                     />
 
@@ -231,7 +231,7 @@ export default class MapComponent extends Component {
                                      } } style={ [ styles.bubble, styles.button ] }>
                                         <Image
                                             source = {
-                                                require('../../assets/Car.imageset/car.png')
+                                                require('../../../assets/Car.imageset/car.png')
                                             }
                                         />
                                     </TouchableOpacity>
@@ -248,7 +248,7 @@ export default class MapComponent extends Component {
                                 title       = ''
                                 description = ''
                                 image       = {
-                                    require('../../assets/key.imageset/key.png')
+                                    require('../../../assets/key.imageset/key.png')
                                 }>
                                 <MapView.Callout>
                                     <Text>
