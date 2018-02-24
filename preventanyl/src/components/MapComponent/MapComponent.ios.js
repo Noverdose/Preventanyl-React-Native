@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { AppRegistry, Text, View, Button, TouchableOpacity, Alert, AlertIOS, StyleSheet, Linking, Image } from 'react-native';
-import MapView from 'react-native-maps';
+import MapView, { AnimatedRegion, Animated } from 'react-native-maps';
 import Timestamp from 'react-timestamp';
 import * as firebase from 'firebase';
 
 import Database from '../../database/Database'
+import { getCurrentLocation } from '../../utils/location';
 
 export default class MapComponent extends Component {
 
@@ -53,7 +54,8 @@ export default class MapComponent extends Component {
     componentDidMount () {
         this.watchId = navigator.geolocation.watchPosition (
             (position) => {
-                this.setState ({
+                console.log (position)
+;                this.setState ({
                     userLocation : {
                         latlng : {
                             latitude  : position.coords.latitude,
@@ -97,7 +99,6 @@ export default class MapComponent extends Component {
         Database.listenForItems (Database.overdosesRef, (items) => {
             let overdoses = [];
             for (let overdose of items) {
-                console.log (overdose);
                 overdoses.push ({
                     date : overdose.date,
                     id   : overdose.id,
@@ -168,14 +169,47 @@ export default class MapComponent extends Component {
                 cancelable : false
             }
         );
-
-        console.log (alert);
     }
 
     findMe () {
+        /*
+        console.log ("USER POSITION : ");
+        getCurrentLocation ().then (result => {
+            console.log (result);
+            this.setState ({
+                userLocation : result
+            })
+        }).catch (error => {
+            console.log (error);
+        }) */
+
         if (this.state.userLocation.latlng.latitude != null && this.state.userLocation.latlng.longitude != null) {
-            console.log (this.map);
+            // console.log (this.map);
             // Center on user position
+
+            console.log (this.state.userLocation.latlng.latitude);
+
+            let region = {
+                latitude       : parseFloat (this.state.userLocation.latlng.latitude),
+                longitude      : parseFloat (this.state.userLocation.latlng.longitude),
+                latitudeDelta  : 0.005,
+                longitudeDelta : 0.005
+            }
+
+            this.setState ({
+                region : region
+            })
+
+            // region.start ();
+
+            /*
+
+            region.timing ({
+                latitude       : this.state.userLocation.latlng.latitude,
+                longitude      : this.state.userLocation.latlng.longitude,
+            }).start (); */
+
+            
             this.map.animateToRegion ({
                 latitude       : this.state.userLocation.latlng.latitude,
                 longitude      : this.state.userLocation.latlng.longitude,
@@ -201,6 +235,7 @@ export default class MapComponent extends Component {
                 </TouchableOpacity>
                 <MapView 
                     style = { styles.map }
+                    initialRegion = { this.state.region }
                     ref   = { map => { 
                         this.map = map 
                         }
