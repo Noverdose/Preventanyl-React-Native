@@ -16,30 +16,54 @@ export default class Database {
     static staticKitsRef = firebase.database ().ref('statickits');
     static overdosesRef  = firebase.database ().ref('overdoses');
 
-    static listenForItems(itemsRef, callback) {
+    static genericListenForItems (itemsRef, callback) {
         let items = [];
-        // console.log (Database.staticKitsRef);
 
         return itemsRef.on('value', (snapshot) => {
 
-            var location = "";
-
             if (snapshot.val ()) {
                 let val = snapshot.val ();
-                let item;
-                for (item in val) {
-                    items.push(val[item]);
-                }
-                callback (items);
+
+                callback (val);
             }
 
         });
-      }
+    }
 
+    static listenForItems (itemsRef, callback) {
+
+        Database.genericListenForItems (itemsRef, (snapshotVal) => {
+            let items = [];
+        
+            items = Object.keys (snapshotVal).map ((item) => {
+                return snapshotVal [item];
+            });
+
+            callback (items);
+        });
+
+        
+    }
+
+    static listenForItemsWithKeys(itemsRef, callback) {
+
+        Database.genericListenForItems (itemsRef, (snapshotVal) => {
+            let items = [];
+            
+            items = Object.keys (snapshotVal).map ((item) => {
+                snapshotVal[item].id = item;
+                return snapshotVal [item];
+            });
+
+            callback (items);
+        });
+
+    }
+    
     async signup(email, pass) {
         try {
             await firebase.auth().
-                createUsserWithEmailAndPassword(email, pass);
+                createUserWithEmailAndPassword(email, pass);
 
             console.log("Account created");
 

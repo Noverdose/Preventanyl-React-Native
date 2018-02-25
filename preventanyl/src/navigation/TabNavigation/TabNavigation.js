@@ -2,10 +2,10 @@ import React from 'react';
 import { TabNavigator } from 'react-navigation';
 import { Text, View, Image, StyleSheet } from 'react-native';
 
-import MapComponent from '../../Components/MapComponent/MapComponent'
-import ProfileComponent from '../../Components/ProfileComponent/ProfileComponent'
-import LoginComponent from '../../Components/LoginComponent/LoginComponent'
-import RegisterKitComponent from '../../Components/RegisterKitComponent/RegisterKitComponent'
+import MapComponent from '../../components/MapComponent/MapComponent'
+import ProfileComponent from '../../components/ProfileComponent/ProfileComponent'
+import LoginComponent from '../../components/LoginComponent/LoginComponent'
+import RegisterKitComponent from '../../components/RegisterKitComponent/RegisterKitComponent'
 
 const TabNavigation = TabNavigator ({
   Map : {
@@ -14,7 +14,7 @@ const TabNavigation = TabNavigator ({
       tabBarLabel : 'Home',
       tabBarIcon  : ({ tintColor }) => (
         <Image 
-          source = { require ('../../assets/map.imageset/map.png') }
+          source = { require ('../../../assets/map.imageset/map.png') }
           style  = { [styles.icon, { tintColor : tintColor }]}
         />
       )
@@ -26,7 +26,7 @@ const TabNavigation = TabNavigator ({
       tabBarLabel : 'Profile',
       tabBarIcon  : ({ tintColor }) => (
         <Image 
-          source = { require ('../../assets/profile.imageset/user_male.png') }
+          source = { require ('../../../assets/profile.imageset/user_male.png') }
           style  = { [styles.icon, { tintColor : tintColor }]}
         />
       )
@@ -42,7 +42,7 @@ const TabNavigation = TabNavigator ({
         }
         ) => (
         <Image 
-          source = { require ('../../assets/address-book.imageset/address_book.png') }
+          source = { require ('../../../assets/address-book.imageset/address_book.png') }
           style  = { [styles.icon, { tintColor : tintColor }]}
         />
       )

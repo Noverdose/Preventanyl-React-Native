@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import { AppRegistry, Text, View, Button, TouchableOpacity, Alert, AlertIOS, StyleSheet, Linking, Image } from 'react-native';
-import MapView from 'react-native-maps';
+
+import MapView, { AnimatedRegion, Animated } from 'react-native-maps';
 import Timestamp from 'react-timestamp';
+import PopupDialog from 'react-native-popup-dialog';
 import * as firebase from 'firebase';
 
-import Database from '../../Database/Database'
+import Database from '../../database/Database'
+import { getCurrentLocation } from '../../utils/location';
 
 export default class MapComponent extends Component {
 
@@ -53,7 +56,8 @@ export default class MapComponent extends Component {
     componentDidMount () {
         this.watchId = navigator.geolocation.watchPosition (
             (position) => {
-                this.setState ({
+                console.log (position)
+;                this.setState ({
                     userLocation : {
                         latlng : {
                             latitude  : position.coords.latitude,
@@ -97,7 +101,6 @@ export default class MapComponent extends Component {
         Database.listenForItems (Database.overdosesRef, (items) => {
             let overdoses = [];
             for (let overdose of items) {
-                console.log (overdose);
                 overdoses.push ({
                     date : overdose.date,
                     id   : overdose.id,
@@ -141,6 +144,8 @@ export default class MapComponent extends Component {
             notifySeconds : 5
         })
 
+        this.popupDialog.show();
+
         let notifyTimer = setInterval (() => {
             if (this.state.notifySeconds > 0)
                 this.setState ({
@@ -155,27 +160,48 @@ export default class MapComponent extends Component {
         this.setState ({
             notifyTimer : notifyTimer
         })
-
-        let alert = Alert.alert (
-            this.state.notifyTitle,
-            'Message',
-            [
-                {
-                    text : 'Notify Angels', onPress : () => console.log ('Notifying Angels')
-                },
-            ],
-            { 
-                cancelable : false
-            }
-        );
-
-        console.log (alert);
+        
     }
 
     findMe () {
+        /*
+        console.log ("USER POSITION : ");
+        getCurrentLocation ().then (result => {
+            console.log (result);
+            this.setState ({
+                userLocation : result
+            })
+        }).catch (error => {
+            console.log (error);
+        }) */
+
         if (this.state.userLocation.latlng.latitude != null && this.state.userLocation.latlng.longitude != null) {
-            console.log (this.map);
+            // console.log (this.map);
             // Center on user position
+
+            console.log (this.state.userLocation.latlng.latitude);
+
+            let region = {
+                latitude       : parseFloat (this.state.userLocation.latlng.latitude),
+                longitude      : parseFloat (this.state.userLocation.latlng.longitude),
+                latitudeDelta  : 0.005,
+                longitudeDelta : 0.005
+            }
+
+            this.setState ({
+                region : region
+            })
+
+            // region.start ();
+
+            /*
+
+            region.timing ({
+                latitude       : this.state.userLocation.latlng.latitude,
+                longitude      : this.state.userLocation.latlng.longitude,
+            }).start (); */
+
+            
             this.map.animateToRegion ({
                 latitude       : this.state.userLocation.latlng.latitude,
                 longitude      : this.state.userLocation.latlng.longitude,
@@ -194,13 +220,20 @@ export default class MapComponent extends Component {
                     underlayColor = '#fff'>
                     <Image 
                         source = {
-                            require('../../assets/location.imageset/define_location.png')
+                            require('../../../assets/location.imageset/define_location.png')
                         }
                     />
 
                 </TouchableOpacity>
+                <PopupDialog
+                    ref = { (popupDialog) => { this.popupDialog = popupDialog; }} >
+                    <View>
+                        <Text>{ this.state.notifyTitle }</Text>
+                    </View>
+                </PopupDialog>
                 <MapView 
                     style = { styles.map }
+                    initialRegion = { this.state.region }
                     ref   = { map => { 
                         this.map = map 
                         }
@@ -231,7 +264,7 @@ export default class MapComponent extends Component {
                                      } } style={ [ styles.bubble, styles.button ] }>
                                         <Image
                                             source = {
-                                                require('../../assets/Car.imageset/car.png')
+                                                require('../../../assets/Car.imageset/car.png')
                                             }
                                         />
                                     </TouchableOpacity>
@@ -248,7 +281,7 @@ export default class MapComponent extends Component {
                                 title       = ''
                                 description = ''
                                 image       = {
-                                    require('../../assets/key.imageset/key.png')
+                                    require('../../../assets/key.imageset/key.png')
                                 }>
                                 <MapView.Callout>
                                     <Text>
@@ -262,61 +295,7 @@ export default class MapComponent extends Component {
                 </MapView>
                 <TouchableOpacity
                     style = { styles.helpMeBtn }
-                    onPress = { () => {
-                        if (this.state.notifyTimer != null) {
-                            clearInterval (this.state.notifyTimer);
-                        }
-                
-                        this.setState ({
-                            notifySeconds : 5,
-                            notifyTitle   : `Notifying in ${ this.state.notifySeconds }`
-                        })
-                
-                        let notifyTimer = setInterval (() => {
-                            console.log (this.state.notifySeconds);
-                            if (this.state.notifySeconds > 0)
-                                this.setState ({
-                                    notifySeconds : this.state.notifySeconds - 1,
-                                    notifyTitle   : `Notifying in ${ this.state.notifySeconds }`
-                                })
-                            else {
-                                clearInterval (this.state.notifyTimer);
-                            }
-                        }, 1000);
-                
-                        this.setState ({
-                            notifyTimer : notifyTimer
-                        })
-                
-                        Alert.alert (
-                            this.state.notifyTitle,
-                            'Message',
-                            [
-                                {
-                                    text : 'Notify Angels', onPress : () => console.log ('Notifying Angels')
-                                },
-                            ],
-                            { 
-                                cancelable : false
-                            }
-                        );
-
-                        /* let alert = AlertIOS.alert (
-                            this.state.notifyTitle,
-                            'Message',
-                            [
-                                {
-                                    text : 'Cancel',
-                                    onPress : () => console.log ('Cancel Pressed'),
-                                }, 
-                                {
-                                    text : 'Notify Angels',
-                                    onPress : () => console.log ('Notifying Angels')
-                                },
-                            ],
-                        ) */
-
-                    } }
+                    onPress = { this.helpMe.bind (this) }
                     underlayColor = '#fff'>
                     <Text style = { styles.helpMeText }>Help Me</Text>
                 </TouchableOpacity>

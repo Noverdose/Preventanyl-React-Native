@@ -14,7 +14,7 @@ export default class LoginComponent extends Component {
             <View style = { styles.logoContainer }>
                 <Image 
                   style = { styles.logo }
-                  source = { require ('../../assets/images/logo/app-store.png') } />
+                  source = { require ('../../../assets/images/logo/app-store.png') } />
                   <Text style = { styles.title }>An app made for preventing overdoses using React-Native</Text>
             </View>
         </TouchableWithoutFeedback>
