@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { AppRegistry, Text, View, Button, TouchableOpacity, Alert, AlertIOS, StyleSheet, Linking, Image } from 'react-native';
+
 import MapView, { AnimatedRegion, Animated } from 'react-native-maps';
 import Timestamp from 'react-timestamp';
+import PopupDialog from 'react-native-popup-dialog';
 import * as firebase from 'firebase';
 
 import Database from '../../database/Database'
@@ -142,6 +144,8 @@ export default class MapComponent extends Component {
             notifySeconds : 5
         })
 
+        this.popupDialog.show();
+
         let notifyTimer = setInterval (() => {
             if (this.state.notifySeconds > 0)
                 this.setState ({
@@ -156,19 +160,7 @@ export default class MapComponent extends Component {
         this.setState ({
             notifyTimer : notifyTimer
         })
-
-        let alert = Alert.alert (
-            this.state.notifyTitle,
-            'Message',
-            [
-                {
-                    text : 'Notify Angels', onPress : () => console.log ('Notifying Angels')
-                },
-            ],
-            { 
-                cancelable : false
-            }
-        );
+        
     }
 
     findMe () {
@@ -233,6 +225,12 @@ export default class MapComponent extends Component {
                     />
 
                 </TouchableOpacity>
+                <PopupDialog
+                    ref = { (popupDialog) => { this.popupDialog = popupDialog; }} >
+                    <View>
+                        <Text>{ this.state.notifyTitle }</Text>
+                    </View>
+                </PopupDialog>
                 <MapView 
                     style = { styles.map }
                     initialRegion = { this.state.region }
@@ -297,61 +295,7 @@ export default class MapComponent extends Component {
                 </MapView>
                 <TouchableOpacity
                     style = { styles.helpMeBtn }
-                    onPress = { () => {
-                        if (this.state.notifyTimer != null) {
-                            clearInterval (this.state.notifyTimer);
-                        }
-                
-                        this.setState ({
-                            notifySeconds : 5,
-                            notifyTitle   : `Notifying in ${ this.state.notifySeconds }`
-                        })
-                
-                        let notifyTimer = setInterval (() => {
-                            console.log (this.state.notifySeconds);
-                            if (this.state.notifySeconds > 0)
-                                this.setState ({
-                                    notifySeconds : this.state.notifySeconds - 1,
-                                    notifyTitle   : `Notifying in ${ this.state.notifySeconds }`
-                                })
-                            else {
-                                clearInterval (this.state.notifyTimer);
-                            }
-                        }, 1000);
-                
-                        this.setState ({
-                            notifyTimer : notifyTimer
-                        })
-                
-                        Alert.alert (
-                            this.state.notifyTitle,
-                            'Message',
-                            [
-                                {
-                                    text : 'Notify Angels', onPress : () => console.log ('Notifying Angels')
-                                },
-                            ],
-                            { 
-                                cancelable : false
-                            }
-                        );
-
-                        /* let alert = AlertIOS.alert (
-                            this.state.notifyTitle,
-                            'Message',
-                            [
-                                {
-                                    text : 'Cancel',
-                                    onPress : () => console.log ('Cancel Pressed'),
-                                }, 
-                                {
-                                    text : 'Notify Angels',
-                                    onPress : () => console.log ('Notifying Angels')
-                                },
-                            ],
-                        ) */
-
-                    } }
+                    onPress = { this.helpMe.bind (this) }
                     underlayColor = '#fff'>
                     <Text style = { styles.helpMeText }>Help Me</Text>
                 </TouchableOpacity>
