@@ -30,7 +30,7 @@ export default class MapComponent extends Component {
             userLoaded    : false,
             initialView   : false,
             isLoading     : false,
-            notifyTitle   : 'notififying in 5 seconds',
+            notifyTitle   : 'Notifying in 5 seconds',
             notifySeconds : 5,
             notifyTimer   : null
         }
@@ -150,7 +150,7 @@ export default class MapComponent extends Component {
             if (this.state.notifySeconds > 0)
                 this.setState ({
                     notifySeconds : this.state.notifySeconds - 1,
-                    notifyTitle   : `Notifying in ${ this.state.notifySeconds }`
+                    notifyTitle   : `Notifying in ${ this.state.notifySeconds } seconds`
                 })
             else {
 
