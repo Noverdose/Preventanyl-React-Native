@@ -1,7 +1,5 @@
 import { Alert } from 'react-native';
 
-import Database from '../database/Database';
-
 const ERROR_TITLE = "Whoops!";
 const REQUIRED_FIELD_TITLE = "Required Field";
 const RESEND_EMAIL = "Resend email";
