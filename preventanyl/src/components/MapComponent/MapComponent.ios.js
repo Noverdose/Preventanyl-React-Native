@@ -4,10 +4,14 @@ import { AppRegistry, Text, View, Button, TouchableOpacity, Alert, AlertIOS, Sty
 import MapView, { AnimatedRegion, Animated } from 'react-native-maps';
 import Timestamp from 'react-timestamp';
 import PopupDialog from 'react-native-popup-dialog';
-import * as firebase from 'firebase';
 
+
+import * as firebase from 'firebase';
 import Database from '../../database/Database'
 import { getCurrentLocation } from '../../utils/location';
+import GenericPopupDialog from '../../utils/GenericPopupDialog';
+
+const notifyTitle = "Notify Angels";
 
 export default class MapComponent extends Component {
 
@@ -30,7 +34,7 @@ export default class MapComponent extends Component {
             userLoaded    : false,
             initialView   : false,
             isLoading     : false,
-            notifyTitle   : 'Notifying in 5 seconds',
+            notifyMessage   : 'Notifying in 5 seconds',
             notifySeconds : 5,
             notifyTimer   : null
         }
@@ -56,8 +60,8 @@ export default class MapComponent extends Component {
     componentDidMount () {
         this.watchId = navigator.geolocation.watchPosition (
             (position) => {
-                console.log (position)
-;                this.setState ({
+                // console.log (position)
+                this.setState ({
                     userLocation : {
                         latlng : {
                             latitude  : position.coords.latitude,
@@ -150,7 +154,7 @@ export default class MapComponent extends Component {
             if (this.state.notifySeconds > 0)
                 this.setState ({
                     notifySeconds : this.state.notifySeconds - 1,
-                    notifyTitle   : `Notifying in ${ this.state.notifySeconds } seconds`
+                    notifyMessage   : `Notifying in ${ this.state.notifySeconds } seconds`,
                 })
             else {
 
@@ -175,15 +179,13 @@ export default class MapComponent extends Component {
             console.log (error);
         }) */
 
-        if (this.state.userLocation.latlng.latitude != null && this.state.userLocation.latlng.longitude != null) {
+        if (this.state.userLocation.latlng.latitude && this.state.userLocation.latlng.longitude) {
             // console.log (this.map);
             // Center on user position
 
-            console.log (this.state.userLocation.latlng.latitude);
-
             let region = {
-                latitude       : parseFloat (this.state.userLocation.latlng.latitude),
-                longitude      : parseFloat (this.state.userLocation.latlng.longitude),
+                latitude       : this.state.userLocation.latlng.latitude,
+                longitude      : this.state.userLocation.latlng.longitude,
                 latitudeDelta  : 0.005,
                 longitudeDelta : 0.005
             }
@@ -191,23 +193,8 @@ export default class MapComponent extends Component {
             this.setState ({
                 region : region
             })
-
-            // region.start ();
-
-            /*
-
-            region.timing ({
-                latitude       : this.state.userLocation.latlng.latitude,
-                longitude      : this.state.userLocation.latlng.longitude,
-            }).start (); */
-
             
-            this.map.animateToRegion ({
-                latitude       : this.state.userLocation.latlng.latitude,
-                longitude      : this.state.userLocation.latlng.longitude,
-                latitudeDelta  : 0.005,
-                longitudeDelta : 0.005
-            })
+            this.map.animateToRegion (region);
         }
     }
 
@@ -225,12 +212,18 @@ export default class MapComponent extends Component {
                     />
 
                 </TouchableOpacity>
-                <PopupDialog
+                {/* <PopupDialog
                     ref = { (popupDialog) => { this.popupDialog = popupDialog; }} >
                     <View>
                         <Text>{ this.state.notifyTitle }</Text>
                     </View>
-                </PopupDialog>
+                </PopupDialog> */}
+                <GenericPopupDialog 
+                    title = { notifyTitle } 
+                    message = { this.state.notifyMessage } 
+                    ref = { (popupDialog) => { this.popupDialog = popupDialog; } } 
+                    actionButtonText = "Notify Angels"
+                    actionFunction = { () => { console.log ("ACTION"); this.popupDialog.dismiss (); } } />
                 <MapView 
                     style = { styles.map }
                     initialRegion = { this.state.region }
