@@ -131,10 +131,10 @@ export default class MapComponent extends Component {
 
     getInitialState() {
         return {
-            latitude: 37.78825,
-            longitude: -122.4324,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
+            latitude: 49.246292,
+            longitude: -123.116226,
+            latitudeDelta: 0.2,
+            longitudeDelta: 0.2,
         };
       }
 
