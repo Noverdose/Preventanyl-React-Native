@@ -8,7 +8,7 @@ import PopupDialog from 'react-native-popup-dialog';
 
 import * as firebase from 'firebase';
 import Database from '../../database/Database'
-import { getCurrentLocation } from '../../utils/location';
+import { getCurrentLocation, convertLocationToLatitudeLongitude } from '../../utils/location';
 import GenericPopupDialog from '../../utils/GenericPopupDialog';
 
 const notifyTitle = "Notify Angels";
@@ -21,7 +21,7 @@ export default class MapComponent extends Component {
         this.getInitialView ();
 
         this.state = {
-            region : this.getInitialState (),
+            region : null,
             staticKits : [],
             overdoses : [],
             userLocation : {
@@ -38,6 +38,8 @@ export default class MapComponent extends Component {
             notifySeconds : 5,
             notifyTimer   : null
         }
+
+        this.setInitialRegionState ();
 
         this.findMe = this.findMe.bind (this);
         this.helpMe = this.helpMe.bind (this);
@@ -57,7 +59,8 @@ export default class MapComponent extends Component {
 
     }
 
-    componentDidMount () {
+    async componentDidMount () {
+        this.mounted = true;
         this.watchId = navigator.geolocation.watchPosition (
             (position) => {
                 // console.log (position)
@@ -125,18 +128,64 @@ export default class MapComponent extends Component {
 
     }
 
-    componentWillUnmount () {
+    async componentWillUnmount () {
         navigator.geolocation.clearWatch (this.watchId);
+        this.mounted = false;
     }
 
-    getInitialState() {
+    genericCreateRegion (location) {
         return {
-            latitude: 49.246292,
-            longitude: -123.116226,
-            latitudeDelta: 0.2,
-            longitudeDelta: 0.2,
-        };
-      }
+            latitude       : location.latitude,
+            longitude      : location.longitude,
+            latitudeDelta  : 0.005,
+            longitudeDelta : 0.005
+        }
+    }
+
+    genericCreateRegionDelta (location, latitudeDelta, longitudeDelta) {
+        return {
+            latitude       : location.latitude,
+            longitude      : location.longitude,
+            latitudeDelta  : latitudeDelta,
+            longitudeDelta : longitudeDelta
+        }
+    }
+
+    createRegionCurrentLocation (successCallback, failureCallback) {
+
+        getCurrentLocation ((result) => {
+            let location = convertLocationToLatitudeLongitude (result);
+
+            if (this.mounted)
+                this.state.userLocation = location;
+
+            location = this.genericCreateRegion (location.latlng);
+
+            successCallback (location);
+        }, (error) => {
+            failureCallback (new Error("Unable to create region"));
+        })
+
+    }
+
+    setInitialRegionState() {
+
+        this.createRegionCurrentLocation ( (result) => {
+            this.setState ({
+                region : result
+            });
+        }, (error) => {
+            this.setState ({
+                region : {
+                    latitude: 49.246292,
+                    longitude: -123.116226,
+                    latitudeDelta: 0.2,
+                    longitudeDelta: 0.2,
+                }
+            });
+        });
+
+    }
 
     helpMe () {
 
@@ -168,34 +217,18 @@ export default class MapComponent extends Component {
     }
 
     findMe () {
-        /*
-        console.log ("USER POSITION : ");
-        getCurrentLocation ().then (result => {
-            console.log (result);
-            this.setState ({
-                userLocation : result
-            })
-        }).catch (error => {
-            console.log (error);
-        }) */
 
-        if (this.state.userLocation.latlng.latitude && this.state.userLocation.latlng.longitude) {
-            // console.log (this.map);
-            // Center on user position
-
-            let region = {
-                latitude       : this.state.userLocation.latlng.latitude,
-                longitude      : this.state.userLocation.latlng.longitude,
-                latitudeDelta  : 0.005,
-                longitudeDelta : 0.005
-            }
-
+        this.createRegionCurrentLocation ((region) => {
             this.setState ({
                 region : region
             })
-            
-            this.map.animateToRegion (region);
-        }
+
+            // Center on user position
+            this.map.animateToRegion (this.state.region);
+        }, (error) => {
+            genericErrorAlert ("Failed to find user");
+        });
+
     }
 
     render () {
