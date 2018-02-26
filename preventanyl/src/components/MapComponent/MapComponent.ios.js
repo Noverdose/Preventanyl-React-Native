@@ -1,10 +1,17 @@
 import React, { Component } from 'react';
 import { AppRegistry, Text, View, Button, TouchableOpacity, Alert, AlertIOS, StyleSheet, Linking, Image } from 'react-native';
-import MapView from 'react-native-maps';
-import Timestamp from 'react-timestamp';
-import * as firebase from 'firebase';
 
-import Database from '../../Database/Database'
+import MapView, { AnimatedRegion, Animated } from 'react-native-maps';
+import Timestamp from 'react-timestamp';
+import PopupDialog from 'react-native-popup-dialog';
+
+
+import * as firebase from 'firebase';
+import Database from '../../database/Database'
+import { getCurrentLocation, convertLocationToLatitudeLongitude } from '../../utils/location';
+import GenericPopupDialog from '../../utils/GenericPopupDialog';
+
+const notifyTitle = "Notify Angels";
 
 export default class MapComponent extends Component {
 
@@ -14,7 +21,7 @@ export default class MapComponent extends Component {
         this.getInitialView ();
 
         this.state = {
-            region : this.getInitialState (),
+            region : null,
             staticKits : [],
             overdoses : [],
             userLocation : {
@@ -27,10 +34,12 @@ export default class MapComponent extends Component {
             userLoaded    : false,
             initialView   : false,
             isLoading     : false,
-            notifyTitle   : 'notififying in 5 seconds',
+            notifyMessage   : 'Notifying in 5 seconds',
             notifySeconds : 5,
             notifyTimer   : null
         }
+
+        this.setInitialRegionState ();
 
         this.findMe = this.findMe.bind (this);
         this.helpMe = this.helpMe.bind (this);
@@ -50,9 +59,11 @@ export default class MapComponent extends Component {
 
     }
 
-    componentDidMount () {
+    async componentDidMount () {
+        this.mounted = true;
         this.watchId = navigator.geolocation.watchPosition (
             (position) => {
+                // console.log (position)
                 this.setState ({
                     userLocation : {
                         latlng : {
@@ -97,7 +108,6 @@ export default class MapComponent extends Component {
         Database.listenForItems (Database.overdosesRef, (items) => {
             let overdoses = [];
             for (let overdose of items) {
-                console.log (overdose);
                 overdoses.push ({
                     date : overdose.date,
                     id   : overdose.id,
@@ -118,18 +128,64 @@ export default class MapComponent extends Component {
 
     }
 
-    componentWillUnmount () {
+    async componentWillUnmount () {
         navigator.geolocation.clearWatch (this.watchId);
+        this.mounted = false;
     }
 
-    getInitialState() {
+    genericCreateRegion (location) {
         return {
-            latitude: 37.78825,
-            longitude: -122.4324,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-        };
-      }
+            latitude       : location.latitude,
+            longitude      : location.longitude,
+            latitudeDelta  : 0.005,
+            longitudeDelta : 0.005
+        }
+    }
+
+    genericCreateRegionDelta (location, latitudeDelta, longitudeDelta) {
+        return {
+            latitude       : location.latitude,
+            longitude      : location.longitude,
+            latitudeDelta  : latitudeDelta,
+            longitudeDelta : longitudeDelta
+        }
+    }
+
+    createRegionCurrentLocation (successCallback, failureCallback) {
+
+        getCurrentLocation ((result) => {
+            let location = convertLocationToLatitudeLongitude (result);
+
+            if (this.mounted)
+                this.state.userLocation = location;
+
+            location = this.genericCreateRegion (location.latlng);
+
+            successCallback (location);
+        }, (error) => {
+            failureCallback (new Error("Unable to create region"));
+        })
+
+    }
+
+    setInitialRegionState() {
+
+        this.createRegionCurrentLocation ( (result) => {
+            this.setState ({
+                region : result
+            });
+        }, (error) => {
+            this.setState ({
+                region : {
+                    latitude: 49.246292,
+                    longitude: -123.116226,
+                    latitudeDelta: 0.2,
+                    longitudeDelta: 0.2,
+                }
+            });
+        });
+
+    }
 
     helpMe () {
 
@@ -141,11 +197,13 @@ export default class MapComponent extends Component {
             notifySeconds : 5
         })
 
+        this.popupDialog.show();
+
         let notifyTimer = setInterval (() => {
             if (this.state.notifySeconds > 0)
                 this.setState ({
                     notifySeconds : this.state.notifySeconds - 1,
-                    notifyTitle   : `Notifying in ${ this.state.notifySeconds }`
+                    notifyMessage   : `Notifying in ${ this.state.notifySeconds } seconds`,
                 })
             else {
 
@@ -155,34 +213,22 @@ export default class MapComponent extends Component {
         this.setState ({
             notifyTimer : notifyTimer
         })
-
-        let alert = Alert.alert (
-            this.state.notifyTitle,
-            'Message',
-            [
-                {
-                    text : 'Notify Angels', onPress : () => console.log ('Notifying Angels')
-                },
-            ],
-            { 
-                cancelable : false
-            }
-        );
-
-        console.log (alert);
+        
     }
 
     findMe () {
-        if (this.state.userLocation.latlng.latitude != null && this.state.userLocation.latlng.longitude != null) {
-            console.log (this.map);
-            // Center on user position
-            this.map.animateToRegion ({
-                latitude       : this.state.userLocation.latlng.latitude,
-                longitude      : this.state.userLocation.latlng.longitude,
-                latitudeDelta  : 0.005,
-                longitudeDelta : 0.005
+
+        this.createRegionCurrentLocation ((region) => {
+            this.setState ({
+                region : region
             })
-        }
+
+            // Center on user position
+            this.map.animateToRegion (this.state.region);
+        }, (error) => {
+            genericErrorAlert ("Failed to find user");
+        });
+
     }
 
     render () {
@@ -194,13 +240,26 @@ export default class MapComponent extends Component {
                     underlayColor = '#fff'>
                     <Image 
                         source = {
-                            require('../../assets/location.imageset/define_location.png')
+                            require('../../../assets/location.imageset/define_location.png')
                         }
                     />
 
                 </TouchableOpacity>
+                {/* <PopupDialog
+                    ref = { (popupDialog) => { this.popupDialog = popupDialog; }} >
+                    <View>
+                        <Text>{ this.state.notifyTitle }</Text>
+                    </View>
+                </PopupDialog> */}
+                <GenericPopupDialog 
+                    title = { notifyTitle } 
+                    message = { this.state.notifyMessage } 
+                    ref = { (popupDialog) => { this.popupDialog = popupDialog; } } 
+                    actionButtonText = "Notify Angels"
+                    actionFunction = { () => { console.log ("ACTION"); this.popupDialog.dismiss (); } } />
                 <MapView 
                     style = { styles.map }
+                    initialRegion = { this.state.region }
                     ref   = { map => { 
                         this.map = map 
                         }
@@ -231,7 +290,7 @@ export default class MapComponent extends Component {
                                      } } style={ [ styles.bubble, styles.button ] }>
                                         <Image
                                             source = {
-                                                require('../../assets/Car.imageset/car.png')
+                                                require('../../../assets/Car.imageset/car.png')
                                             }
                                         />
                                     </TouchableOpacity>
@@ -248,7 +307,7 @@ export default class MapComponent extends Component {
                                 title       = ''
                                 description = ''
                                 image       = {
-                                    require('../../assets/key.imageset/key.png')
+                                    require('../../../assets/key.imageset/key.png')
                                 }>
                                 <MapView.Callout>
                                     <Text>
@@ -262,61 +321,7 @@ export default class MapComponent extends Component {
                 </MapView>
                 <TouchableOpacity
                     style = { styles.helpMeBtn }
-                    onPress = { () => {
-                        if (this.state.notifyTimer != null) {
-                            clearInterval (this.state.notifyTimer);
-                        }
-                
-                        this.setState ({
-                            notifySeconds : 5,
-                            notifyTitle   : `Notifying in ${ this.state.notifySeconds }`
-                        })
-                
-                        let notifyTimer = setInterval (() => {
-                            console.log (this.state.notifySeconds);
-                            if (this.state.notifySeconds > 0)
-                                this.setState ({
-                                    notifySeconds : this.state.notifySeconds - 1,
-                                    notifyTitle   : `Notifying in ${ this.state.notifySeconds }`
-                                })
-                            else {
-                                clearInterval (this.state.notifyTimer);
-                            }
-                        }, 1000);
-                
-                        this.setState ({
-                            notifyTimer : notifyTimer
-                        })
-                
-                        Alert.alert (
-                            this.state.notifyTitle,
-                            'Message',
-                            [
-                                {
-                                    text : 'Notify Angels', onPress : () => console.log ('Notifying Angels')
-                                },
-                            ],
-                            { 
-                                cancelable : false
-                            }
-                        );
-
-                        /* let alert = AlertIOS.alert (
-                            this.state.notifyTitle,
-                            'Message',
-                            [
-                                {
-                                    text : 'Cancel',
-                                    onPress : () => console.log ('Cancel Pressed'),
-                                }, 
-                                {
-                                    text : 'Notify Angels',
-                                    onPress : () => console.log ('Notifying Angels')
-                                },
-                            ],
-                        ) */
-
-                    } }
+                    onPress = { this.helpMe.bind (this) }
                     underlayColor = '#fff'>
                     <Text style = { styles.helpMeText }>Help Me</Text>
                 </TouchableOpacity>

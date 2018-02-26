@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { AppRegistry, View, Text, TextInput, TouchableOpacity, StatusBar, StyleSheet } from 'react-native';
 
-import Database from '../../Database/Database';
+import Database from '../../database/Database';
 
 export default class LoginForm extends Component {
 
