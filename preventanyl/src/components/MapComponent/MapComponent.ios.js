@@ -10,6 +10,7 @@ import * as firebase from 'firebase';
 import Database from '../../database/Database'
 import { getCurrentLocation, convertLocationToLatitudeLongitude } from '../../utils/location';
 import GenericPopupDialog from '../../utils/GenericPopupDialog';
+import { registerForPushNotificationsAsync, sendPushNotification, handleRegister } from '../../pushnotifications/SendPushNotification';
 
 const notifyTitle = "Notify Angels";
 
@@ -125,6 +126,11 @@ export default class MapComponent extends Component {
                 })
             }
         });
+
+        // Replace later with one function
+        let token = await registerForPushNotificationsAsync ();
+        handleRegister ();
+        sendPushNotification (token);
 
     }
 
