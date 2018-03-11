@@ -21,18 +21,6 @@ const TabNavigation = TabNavigator ({
       )
     },
   },
-  Profile : {
-    screen : LoginComponent,
-    navigationOptions : {
-      tabBarLabel : 'Profile',
-      tabBarIcon  : ({ tintColor }) => (
-        <Image 
-          source = { require ('../../../assets/profile.imageset/user_male.png') }
-          style  = { [styles.icon, { tintColor : tintColor }]}
-        />
-      )
-    },
-  },
   Register : {
     screen : RegisterKitComponent,
     navigationOptions : {
