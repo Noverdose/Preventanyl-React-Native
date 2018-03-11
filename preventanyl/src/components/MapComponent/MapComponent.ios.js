@@ -18,8 +18,6 @@ const notifyTitle = "Notify Angels";
 
 export default class MapComponent extends Component {
 
-    overdosesLoaded = false;
-
     constructor () {
         super ();
 
@@ -28,7 +26,6 @@ export default class MapComponent extends Component {
         this.state = {
             region : null,
             staticKits : [],
-            overdoses : [],
             userLocation : {
                 latlng : {
                     latitude  : null,
@@ -108,80 +105,6 @@ export default class MapComponent extends Component {
             this.setState ({
                 staticKits : staticKits
             });
-        });
-
-        Database.genericListenForItem (Database.overdosesRef, Database.firebaseEventTypes.Added, (item) => {
-            if (this.overdosesLoaded) {
-
-                overdoses = this.state.overdoses;
-
-                overdose = Overdose.generateOverdoseFromSnapshot(item);
-
-                index = overdoses.find (obj => obj.id === overdose.id)
-
-                if (index !== undefined && index !== -1)
-                    return;
-
-                overdoses.push (overdose)
-
-                this.setState ({
-                    overdoses : overdoses
-                })
-
-            }
-        })
-
-        Database.genericListenForItem (Database.overdosesRef, Database.firebaseEventTypes.Removed, (item) => {
-            if (this.overdosesLoaded) {
-
-                overdoses = this.state.overdoses.filter( (overdose) => {
-                    return overdose.id !== item.id
-                });
-
-                this.setState ({
-                    overdoses : overdoses
-                })
-
-            }
-        })
-
-        Database.genericListenForItem (Database.overdosesRef, Database.firebaseEventTypes.Changed, (item) => {
-            if (this.overdosesLoaded) {
-                
-                overdoses = this.state.overdoses;
-
-                overdose = Overdose.generateOverdoseFromSnapshot(item);
-
-                index = overdoses.find (obj => obj.id === overdose.id)
-
-                if (index === undefined || index === -1)
-                    return;
-
-                overdoses[index] = overdose;
-
-                this.setState ({
-                    overdoses : overdoses
-                })
-
-            }
-        })
-
-        Database.listenForItems (Database.overdosesRef, (items) => {
-            if (!this.overdosesLoaded) {
-            
-                let overdoses = [];
-
-                overdoses = items.map ( (overdose) => { 
-                    return Overdose.generateOverdoseFromSnapshot (overdose);
-                })
-
-                this.setState ({
-                    overdoses : overdoses
-                })
-
-                this.overdosesLoaded = true;
-
-            }
         });
 
         // Replace later with one function
@@ -392,26 +315,6 @@ export default class MapComponent extends Component {
                                             }
                                         />
                                     </TouchableOpacity>
-                                </MapView.Callout>
-                            </MapView.Marker>
-                        ))
-                    }
-                    {
-                        this.state.overdoses.length > 0 && 
-                        this.state.overdoses.map ((marker, index) => (
-                            <MapView.Marker
-                                key         = { marker.key }
-                                coordinate  = { marker.latlng }
-                                title       = ''
-                                description = ''
-                                image       = {
-                                    require('../../../assets/key.imageset/key.png')
-                                }>
-                                <MapView.Callout>
-                                    <Text>
-                                        Reported Overdose at <Timestamp time = { marker.timestamp } component = { Text } />
-                                    </Text>
-                                    
                                 </MapView.Callout>
                             </MapView.Marker>
                         ))
