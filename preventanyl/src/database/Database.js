@@ -16,18 +16,36 @@ export default class Database {
     static staticKitsRef = firebase.database ().ref('statickits');
     static overdosesRef  = firebase.database ().ref('overdoses');
 
+    static firebaseEventTypes = Object.freeze ({
+        "Added"   : "child_added",
+        "Changed" : "child_changed",
+        "Removed" : "child_removed"
+    })
+
     static genericListenForItems (itemsRef, callback) {
         let items = [];
 
         return itemsRef.on('value', (snapshot) => {
 
-            if (snapshot.val ()) {
-                let val = snapshot.val ();
+            let val = snapshot.val ();
 
+            if (val)
                 callback (val);
-            }
 
         });
+    }
+
+    static genericListenForItem (itemsRef, eventType, callback) {
+        // retrieve the last record from `itemsRef`
+        return itemsRef.limitToLast(1).on(eventType, function(snapshot) {
+
+            let val = snapshot.val ();
+
+            // all records after the last continue to invoke this function
+            if (val)
+                callback (val);
+         
+         });
     }
 
     static addItem (itemsRef, item) {

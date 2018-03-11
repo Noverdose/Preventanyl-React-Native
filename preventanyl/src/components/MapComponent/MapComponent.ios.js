@@ -8,6 +8,7 @@ import PopupDialog from 'react-native-popup-dialog';
 import * as firebase from 'firebase';
 import Database from '../../database/Database'
 import { getCurrentLocation, convertLocationToLatitudeLongitude } from '../../utils/location';
+import { genericErrorAlert } from '../../utils/genericAlerts';
 import GenericPopupDialog from '../../utils/GenericPopupDialog';
 import { registerForPushNotificationsAsync, sendPushNotification, handleRegister, notifyAngels } from '../../pushnotifications/SendPushNotification';
 
@@ -16,6 +17,8 @@ import Overdose from '../../objects/Overdose';
 const notifyTitle = "Notify Angels";
 
 export default class MapComponent extends Component {
+
+    overdosesLoaded = false;
 
     constructor () {
         super ();
@@ -107,16 +110,77 @@ export default class MapComponent extends Component {
             });
         });
 
-        Database.listenForItems (Database.overdosesRef, (items) => {
-            let overdoses = [];
-            for (let overdose of items) {
-                overdoses.push (
-                    Overdose.generateOverdoseFromSnapshot (overdose)
-                );
+        Database.genericListenForItem (Database.overdosesRef, Database.firebaseEventTypes.Added, (item) => {
+            if (this.overdosesLoaded) {
+
+                overdoses = this.state.overdoses;
+
+                overdose = Overdose.generateOverdoseFromSnapshot(item);
+
+                index = overdoses.find (obj => obj.id === overdose.id)
+
+                if (index !== undefined && index !== -1)
+                    return;
+
+                overdoses.push (overdose)
 
                 this.setState ({
                     overdoses : overdoses
                 })
+
+            }
+        })
+
+        Database.genericListenForItem (Database.overdosesRef, Database.firebaseEventTypes.Removed, (item) => {
+            if (this.overdosesLoaded) {
+
+                overdoses = this.state.overdoses.filter( (overdose) => {
+                    return overdose.id !== item.id
+                });
+
+                this.setState ({
+                    overdoses : overdoses
+                })
+
+            }
+        })
+
+        Database.genericListenForItem (Database.overdosesRef, Database.firebaseEventTypes.Changed, (item) => {
+            if (this.overdosesLoaded) {
+                
+                overdoses = this.state.overdoses;
+
+                overdose = Overdose.generateOverdoseFromSnapshot(item);
+
+                index = overdoses.find (obj => obj.id === overdose.id)
+
+                if (index === undefined || index === -1)
+                    return;
+
+                overdoses[index] = overdose;
+
+                this.setState ({
+                    overdoses : overdoses
+                })
+
+            }
+        })
+
+        Database.listenForItems (Database.overdosesRef, (items) => {
+            if (!this.overdosesLoaded) {
+            
+                let overdoses = [];
+
+                overdoses = items.map ( (overdose) => { 
+                    return Overdose.generateOverdoseFromSnapshot (overdose);
+                })
+
+                this.setState ({
+                    overdoses : overdoses
+                })
+
+                this.overdosesLoaded = true;
+
             }
         });
 
@@ -186,34 +250,44 @@ export default class MapComponent extends Component {
 
     }
 
-    helpMe () {
+    resetHelpTimer () {
 
         if (this.state.notifyTimer != null) {
             clearInterval (this.state.notifyTimer);
         }
 
         this.setState ({
-            notifySeconds : 5
+            notifySeconds : 5,
+            notifyMessage   : `Notifying in ${ this.state.notifySeconds } seconds`
         })
+       
+    }
+
+    helpMe () {
+
+        this.resetHelpTimer ();
 
         this.popupDialog.show();
 
         let notifyTimer = setInterval (() => {
-            if (this.state.notifySeconds > 0)
+            if (this.state.notifySeconds > 0) {
                 this.setState ({
                     notifySeconds : this.state.notifySeconds - 1,
-                    notifyMessage   : `Notifying in ${ this.state.notifySeconds } seconds`,
+                    notifyMessage : `Notifying in ${ this.state.notifySeconds } seconds`
                 })
-            else {
 
+                console.log (this.state.notifyMessage);
+            } else {
+                this.popupDialog.dismiss ();
+                console.log ("TIME IS ZERO");
+                notifyAngels ();
+                clearInterval (this.state.notifyTimer);
             }
         }, 1000);
 
         this.setState ({
             notifyTimer : notifyTimer
         })
-
-        notifyAngels ();
         
     }
 
@@ -257,7 +331,17 @@ export default class MapComponent extends Component {
                     message = { this.state.notifyMessage } 
                     ref = { (popupDialog) => { this.popupDialog = popupDialog; } } 
                     actionButtonText = "Notify Angels"
-                    actionFunction = { () => { console.log ("ACTION"); this.popupDialog.dismiss (); } } />
+                    cancelFunction = { () => {
+                        console.log ("Cancelling Popup")
+                        this.resetHelpTimer ();
+                    }}
+                    actionFunction = { () => { 
+                            console.log ("Notifying Angels");
+                            notifyAngels ();
+                            this.resetHelpTimer ();
+                            this.popupDialog.dismiss (); 
+                        }
+                    } />
                 <MapView 
                     style = { styles.map }
                     initialRegion = { this.state.region }
@@ -286,8 +370,21 @@ export default class MapComponent extends Component {
                                     <TouchableOpacity onPress = { () => {
                                         let url = `http://maps.apple.com/?saddr=${ this.state.userLocation.latlng.latitude },${ this.state.userLocation.latlng.longitude }&daddr=${ marker.latlng.latitude },${ marker.latlng.longitude }`;
                                         console.log (url);
-                                        if (Linking.canOpenURL (url))
-                                            Linking.openURL (url);
+                                        Linking.canOpenURL (url).then ( (supported) => {
+                                            if (!supported)
+                                                genericErrorAlert ("You must have apple maps installed to use this")
+                                            else {
+                                                return Linking.openURL (url).then ( (data) => {
+                                                    console.log (data);
+                                                }).catch ( (error) => {
+                                                    console.log (error)
+                                                    genericErrorAlert ("You must have apple maps installed to use this")
+                                                })
+                                            }
+                                        }).catch ( (error) => {
+                                            console.log (error);
+                                            genericErrorAlert ("Unable to give directions")
+                                        })
                                      } } style={ [ styles.bubble, styles.button ] }>
                                         <Image
                                             source = {

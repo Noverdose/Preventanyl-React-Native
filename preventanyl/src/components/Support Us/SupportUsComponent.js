@@ -3,19 +3,13 @@ import { AppRegistry, KeyboardAvoidingView, ScrollView, StyleSheet, Text, Toucha
 
 import DismissKeyboard from 'dismissKeyboard';
 
-import RegisterKitForm from './RegisterKitForm';
-
-export default class RegisterKitComponent extends Component {
+export default class SupportUsComponent extends Component {
 
   render () {
     return (
-      <KeyboardAvoidingView behavior = 'padding' style = { styles.container } onPress = { () => { DismissKeyboard () } } >
-        <TouchableWithoutFeedback onPress = { () => { DismissKeyboard () } }>
-            <ScrollView  onPress = { () => { DismissKeyboard () } } >
-                <RegisterKitForm />
-            </ScrollView>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
+        <View style = { styles.container } >
+            <Text>SupportUsComponent</Text>
+        </View>
     );
   }
 

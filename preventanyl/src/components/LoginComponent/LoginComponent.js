@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { AppRegistry, Text, View, Image, KeyboardAvoidingView, StyleSheet, TouchableWithoutFeedback } from 'react-native';
+
 import DismissKeyboard from 'dismissKeyboard';
 
 import LoginForm from './LoginForm';

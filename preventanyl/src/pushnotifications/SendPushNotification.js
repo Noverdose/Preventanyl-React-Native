@@ -143,7 +143,7 @@ export const sendPushNotification = (expoToken) => {
     })
 }
 
-export const notifyAngels = () => {
+export const notifyAngels = async () => {
     getCurrentLocation ( (result) => {
         location = convertLocationToLatitudeLongitude (result);
         console.log (location);
