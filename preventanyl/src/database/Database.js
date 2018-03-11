@@ -116,7 +116,7 @@ export default class Database {
         }
     }
 
-    async logout() {
+    static async logout() {
         try {
             await firebase.auth().signOut();
 
