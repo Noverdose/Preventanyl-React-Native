@@ -133,10 +133,31 @@ export default class MapComponent extends Component {
 
         Database.genericListenForItem (Database.overdosesRef, Database.firebaseEventTypes.Removed, (item) => {
             if (this.overdosesLoaded) {
-                
+
                 overdoses = this.state.overdoses.filter( (overdose) => {
                     return overdose.id !== item.id
                 });
+
+                this.setState ({
+                    overdoses : overdoses
+                })
+
+            }
+        })
+
+        Database.genericListenForItem (Database.overdosesRef, Database.firebaseEventTypes.Changed, (item) => {
+            if (this.overdosesLoaded) {
+                
+                overdoses = this.state.overdoses;
+
+                overdose = Overdose.generateOverdoseFromSnapshot(item);
+
+                index = overdoses.find (obj => obj.id === overdose.id)
+
+                if (index === undefined || index === -1)
+                    return;
+
+                overdoses[index] = overdose;
 
                 this.setState ({
                     overdoses : overdoses
