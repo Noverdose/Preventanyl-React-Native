@@ -30,6 +30,18 @@ export default class Database {
         });
     }
 
+    static addItem (itemsRef, item) {
+        itemsRef.update (item)
+    }
+
+    static addItemWithChildPathId (itemsRef, childPath, item) {
+        itemsRef.child (`${ childPath }/${ item.id }`).update (item)
+    }
+
+    static addItemWithChildId (itemsRef, item) {
+        itemsRef.child (`/${ item.id }`).update (item)
+    }
+
     static listenForItems (itemsRef, callback) {
 
         Database.genericListenForItems (itemsRef, (snapshotVal) => {

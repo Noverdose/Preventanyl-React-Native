@@ -5,12 +5,13 @@ import MapView, { AnimatedRegion, Animated } from 'react-native-maps';
 import Timestamp from 'react-timestamp';
 import PopupDialog from 'react-native-popup-dialog';
 
-
 import * as firebase from 'firebase';
 import Database from '../../database/Database'
 import { getCurrentLocation, convertLocationToLatitudeLongitude } from '../../utils/location';
 import GenericPopupDialog from '../../utils/GenericPopupDialog';
-import { registerForPushNotificationsAsync, sendPushNotification, handleRegister } from '../../pushnotifications/SendPushNotification';
+import { registerForPushNotificationsAsync, sendPushNotification, handleRegister, notifyAngels } from '../../pushnotifications/SendPushNotification';
+
+import Overdose from '../../objects/Overdose';
 
 const notifyTitle = "Notify Angels";
 
@@ -109,17 +110,9 @@ export default class MapComponent extends Component {
         Database.listenForItems (Database.overdosesRef, (items) => {
             let overdoses = [];
             for (let overdose of items) {
-                overdoses.push ({
-                    date : overdose.date,
-                    id   : overdose.id,
-                    key  : overdose.id,
-                    latlng : {
-                        latitude  : overdose.latitude,
-                        longitude : overdose.longitude
-                    },
-                    region    : overdose.region,
-                    timestamp : overdose.timestamp,
-                });
+                overdoses.push (
+                    Overdose.generateOverdoseFromSnapshot (overdose)
+                );
 
                 this.setState ({
                     overdoses : overdoses
@@ -128,9 +121,9 @@ export default class MapComponent extends Component {
         });
 
         // Replace later with one function
-        let token = await registerForPushNotificationsAsync ();
-        handleRegister ();
-        sendPushNotification (token);
+        // let token = await registerForPushNotificationsAsync ();
+        // handleRegister ();
+        // sendPushNotification (token);
 
     }
 
@@ -219,6 +212,8 @@ export default class MapComponent extends Component {
         this.setState ({
             notifyTimer : notifyTimer
         })
+
+        notifyAngels ();
         
     }
 
