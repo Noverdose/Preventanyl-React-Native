@@ -11,7 +11,7 @@ export default class RegisterKitComponent extends Component {
     return (
       <KeyboardAvoidingView behavior = 'padding' style = { styles.container } onPress = { () => { DismissKeyboard () } } >
         <TouchableWithoutFeedback onPress = { () => { DismissKeyboard () } }>
-            <ScrollView keyboardDismissMode = 'on-drag' >
+            <ScrollView  onPress = { () => { DismissKeyboard () } } >
                 <RegisterKitForm />
             </ScrollView>
         </TouchableWithoutFeedback>
