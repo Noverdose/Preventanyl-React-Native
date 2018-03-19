@@ -4,13 +4,21 @@ import { AppRegistry, Text, View, Button, TouchableOpacity, Alert, AlertIOS, Sty
 import MapView, { AnimatedRegion, Animated } from 'react-native-maps';
 import Timestamp from 'react-timestamp';
 import PopupDialog from 'react-native-popup-dialog';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 import * as firebase from 'firebase';
+
 import Database from '../../database/Database'
+import PushNotifications from '../../pushnotifications/PushNotifications';
+import PreventanylNotifications from '../../pushnotifications/PreventanylNotifications';
+
 import { getCurrentLocation, convertLocationToLatitudeLongitude } from '../../utils/location';
+import { formatDateTime } from '../../utils/localTimeHelper';
 import { genericErrorAlert } from '../../utils/genericAlerts';
+import { generateAppleMapsUrl } from '../../utils/linkingUrls';
+
 import GenericPopupDialog from '../../utils/GenericPopupDialog';
-import { registerForPushNotificationsAsync, sendPushNotification, handleRegister, notifyAngels } from '../../pushnotifications/SendPushNotification';
+import MapCallout from '../../subcomponents/MapCallout/MapCallout';
 
 import Overdose from '../../objects/Overdose';
 
@@ -18,10 +26,10 @@ const notifyTitle = "Notify Angels";
 
 export default class MapComponent extends Component {
 
+    static spinnerFunctionsLoading = 0;
+
     constructor () {
         super ();
-
-        this.getInitialView ();
 
         this.state = {
             region : null,
@@ -33,8 +41,6 @@ export default class MapComponent extends Component {
                 },
                 error : null,
             },
-            userLoaded    : false,
-            initialView   : false,
             isLoading     : false,
             notifyMessage   : 'Notifying in 5 seconds',
             notifySeconds : 5,
@@ -45,26 +51,18 @@ export default class MapComponent extends Component {
 
         this.findMe = this.findMe.bind (this);
         this.helpMe = this.helpMe.bind (this);
-        this.getInitialView = this.getInitialView.bind(this);
-    }
-
-    getInitialView () {
-
-        firebase.auth ().onAuthStateChanged ( (user) => {
-            let initialView = user ? "Home" : "Login";
-
-            this.setState ({
-                userLoaded  : true,
-                initialView : initialView
-            })
-        })
-
+        PushNotifications.setup ();
     }
 
     async componentDidMount () {
         this.mounted = true;
+
+        this.setState ({
+            isLoading : true
+        });
+
         this.watchId = navigator.geolocation.watchPosition (
-            (position) => {
+            async (position) => {
                 // console.log (position)
                 this.setState ({
                     userLocation : {
@@ -87,36 +85,62 @@ export default class MapComponent extends Component {
             }
         );
 
-        Database.listenForItems (Database.staticKitsRef, (kits) => {
-            let staticKits = [];
-            for (let kit of kits) {
-                staticKits.push ({
-                    title : kit.displayName,
-                    description : kit.comments,
-                    latlng : {
-                        latitude : kit.coordinates.lat,
-                        longitude : kit.coordinates.long,
-                    },
-                    id : kit.id,
-                    key : kit.id
-                })
-            }
-            
-            this.setState ({
-                staticKits : staticKits
-            });
-        });
+        Database.listenForItems (Database.firebaseRefs.staticKitsRef, async (kits) => {
 
-        // Replace later with one function
-        // let token = await registerForPushNotificationsAsync ();
-        // handleRegister ();
-        // sendPushNotification (token);
+            await this.simpleLoadingFunction ( async () => { 
+                let staticKits = [];
+
+                for (let kit of kits)
+                    staticKits.push ({
+                        title : kit.displayName,
+                        description : kit.comments,
+                        latlng : {
+                            latitude : kit.coordinates.lat,
+                            longitude : kit.coordinates.long,
+                        },
+                        id : kit.id,
+                        key : kit.id
+                    })
+                
+                this.setState ({
+                    staticKits : staticKits
+                });
+
+            });
+
+        });
 
     }
 
     async componentWillUnmount () {
         navigator.geolocation.clearWatch (this.watchId);
         this.mounted = false;
+    }
+
+    // PRECONDITION : isLoading must be true before function call
+    simpleLoadingFunction = async (func) => {
+
+        try {
+
+            ++MapComponent.spinnerFunctionsLoading;
+            await func ();
+
+        } catch (error) {
+
+            console.warn (error);
+            genericErrorDescriptionAlert (error);
+
+        } finally {
+
+            --MapComponent.spinnerFunctionsLoading;
+
+            if (MapComponent.spinnerFunctionsLoading === 0 && this.mounted)
+                this.setState ({
+                    isLoading : false
+                })
+
+        }
+
     }
 
     genericCreateRegion (location) {
@@ -232,15 +256,24 @@ export default class MapComponent extends Component {
     render () {
         return (
             <View style = { styles.container }>
+
+                <Spinner
+                    visible = { this.state.isLoading }
+                    textContent = { "Loading..." }
+                    textStyle = {
+                        { color : '#FFF' }
+                    }
+                    cancelable = { false } />
+
                 <TouchableOpacity
                     styles = { styles.findMeBtn }
                     onPress = { this.findMe } 
                     underlayColor = '#fff'>
+
                     <Image 
                         source = {
                             require('../../../assets/location.imageset/define_location.png')
-                        }
-                    />
+                        } />
 
                 </TouchableOpacity>
                 {/* <PopupDialog
@@ -272,6 +305,7 @@ export default class MapComponent extends Component {
                         this.map = map 
                         }
                     } >
+
                     { this.state.userLocation.latlng.latitude != null && this.state.userLocation.latlng.longitude != null &&
                         <MapView.Marker 
                             coordinate  = { this.state.userLocation.latlng } 
@@ -287,45 +321,24 @@ export default class MapComponent extends Component {
                                 coordinate  = { marker.latlng }
                                 title       = { marker.title }
                                 description = { marker.description } >
-                                <MapView.Callout>
-                                    <Text>{ marker.title }</Text>
-                                    <Text>{ marker.description }</Text>
-                                    <TouchableOpacity onPress = { () => {
-                                        let url = `http://maps.apple.com/?saddr=${ this.state.userLocation.latlng.latitude },${ this.state.userLocation.latlng.longitude }&daddr=${ marker.latlng.latitude },${ marker.latlng.longitude }`;
-                                        console.log (url);
-                                        Linking.canOpenURL (url).then ( (supported) => {
-                                            if (!supported)
-                                                genericErrorAlert ("You must have apple maps installed to use this")
-                                            else {
-                                                return Linking.openURL (url).then ( (data) => {
-                                                    console.log (data);
-                                                }).catch ( (error) => {
-                                                    console.log (error)
-                                                    genericErrorAlert ("You must have apple maps installed to use this")
-                                                })
-                                            }
-                                        }).catch ( (error) => {
-                                            console.log (error);
-                                            genericErrorAlert ("Unable to give directions")
-                                        })
-                                     } } style={ [ styles.bubble, styles.button ] }>
-                                        <Image
-                                            source = {
-                                                require('../../../assets/Car.imageset/car.png')
-                                            }
-                                        />
-                                    </TouchableOpacity>
-                                </MapView.Callout>
+                                <MapCallout 
+                                    title = { marker.title }
+                                    description = { marker.description }
+                                    url = { generateAppleMapsUrl ( this.state.userLocation.latlng, marker.latlng ) }
+                                />
                             </MapView.Marker>
                         ))
                     }
+
                 </MapView>
+
                 <TouchableOpacity
                     style = { styles.helpMeBtn }
                     onPress = { this.helpMe.bind (this) }
                     underlayColor = '#fff'>
                     <Text style = { styles.helpMeText }>Help Me</Text>
                 </TouchableOpacity>
+                
             </View>
         );
     }
