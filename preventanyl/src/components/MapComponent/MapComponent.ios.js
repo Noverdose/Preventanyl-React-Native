@@ -293,7 +293,7 @@ export default class MapComponent extends Component {
                     }}
                     actionFunction = { () => { 
                             console.log ("Notifying Angels");
-                            notifyAngels ();
+                            PreventanylNotifications.notifyAngels ();
                             this.resetHelpTimer ();
                             this.popupDialog.dismiss (); 
                         }
