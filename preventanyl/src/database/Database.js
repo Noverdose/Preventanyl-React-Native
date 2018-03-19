@@ -1,5 +1,8 @@
 import * as firebase from "firebase";
 
+import spinnerFunction from '../utils/spinnerFunction';
+import { genericVerificationAlert } from '../utils/genericAlerts';
+
 const config = {
     apiKey: "AIzaSyBa2ZiHRF2TrEaLBw3JrctIgT-UOU0tN84",
     authDomain: "preventanyl.firebaseapp.com",
@@ -13,8 +16,14 @@ const firebaseApp = firebase.initializeApp (config);
 
 export default class Database {
 
-    static staticKitsRef = firebase.database ().ref('statickits');
-    static overdosesRef  = firebase.database ().ref('overdoses');
+    static firebaseRefs = Object.freeze ({
+        "staticKitsRef"    : firebase.database ().ref ('statickits'),
+        "overdosesRef"     : firebase.database ().ref ('overdoses'),
+        "usersRef"         : firebase.database ().ref ().child ("user"),
+        "userLocationsRef" : firebase.database().ref ().child ("userLocations")
+    })
+
+    static currentUser = undefined;
 
     static firebaseEventTypes = Object.freeze ({
         "Added"   : "child_added",
@@ -50,6 +59,10 @@ export default class Database {
 
     static addItem (itemsRef, item) {
         itemsRef.update (item)
+    }
+
+    static addItemWithChildPath (itemsRef, childPath, item) {
+        itemsRef.child (`${ childPath }/`).update (item)
     }
 
     static addItemWithChildPathId (itemsRef, childPath, item) {
@@ -89,42 +102,5 @@ export default class Database {
         });
 
     }
-    
-    async signup(email, pass) {
-        try {
-            await firebase.auth().
-                createUserWithEmailAndPassword(email, pass);
-
-            console.log("Account created");
-
-            // Navigate to home page, user is auto logged in
-        } catch (error) {
-            console.log(error.toString());
-        }
-    }
-
-    static async login(email, pass) {
-        try {
-            await firebase.auth().
-                signInWithEmailAndPassword(email, pass);
-
-            console.log("Logged in");
-
-            // Navigate to home page, after login
-        } catch (error) {
-            console.log(error.toString());
-        }
-    }
-
-    static async logout() {
-        try {
-            await firebase.auth().signOut();
-
-            // Navigate to login component
-        } catch (error) {
-            console.log(error.toString());
-        }
-    }
-
 
 }
