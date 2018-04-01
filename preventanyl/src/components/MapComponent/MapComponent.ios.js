@@ -51,7 +51,7 @@ export default class MapComponent extends Component {
 
         this.findMe = this.findMe.bind (this);
         this.helpMe = this.helpMe.bind (this);
-        PushNotifications.setup ();
+        // PushNotifications.setup ();
     }
 
     async componentDidMount () {
@@ -227,7 +227,7 @@ export default class MapComponent extends Component {
             } else {
                 this.popupDialog.dismiss ();
                 console.log ("TIME IS ZERO");
-                notifyAngels ();
+                PreventanylNotifications.notifyAngels ();
                 clearInterval (this.state.notifyTimer);
             }
         }, 1000);

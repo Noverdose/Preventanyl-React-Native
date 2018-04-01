@@ -21,11 +21,11 @@ export default class PreventanylNotifications {
             console.log (url);
 
             // POST the token to your backend server from where you can retrieve it to send push notifications.
-            fetch(url, {
+            /* fetch(url, {
                 method: 'POST',
             }).catch (error => {
                 console.log (error)
-            })
+            }) */
 
         }, (error) => {
             console.log (error);
