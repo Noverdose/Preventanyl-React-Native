@@ -325,17 +325,6 @@ export default class MapComponent extends Component {
                     }
                     cancelable = { false } />
 
-                <TouchableOpacity
-                    styles = { styles.findMeBtn }
-                    onPress = { this.findMe } 
-                    underlayColor = '#fff'>
-
-                    <Image 
-                        source = {
-                            require('../../../assets/location.imageset/define_location.png')
-                        } />
-
-                </TouchableOpacity>
                 {/* <PopupDialog
                     ref = { (popupDialog) => { this.popupDialog = popupDialog; }} >
                     <View>
@@ -365,6 +354,18 @@ export default class MapComponent extends Component {
                         this.map = map 
                         }
                     } >
+
+                    <TouchableOpacity
+                        styles = { styles.findMeBtn }
+                        onPress = { this.findMe } 
+                        underlayColor = '#fff'>
+
+                        <Image 
+                            source = {
+                                require('../../../assets/location.imageset/define_location.png')
+                            } />
+
+                    </TouchableOpacity>
 
                     { this.state.userLocation.latlng.latitude != null && this.state.userLocation.latlng.longitude != null &&
                         <MapView.Marker 
