@@ -262,13 +262,12 @@ export default class MapComponent extends Component {
 
     resetHelpTimer () {
 
-        if (this.state.notifyTimer != null) {
+        if (this.state.notifyTimer != null)
             clearInterval (this.state.notifyTimer);
-        }
 
         this.setState ({
             notifySeconds : 5,
-            notifyMessage   : `Notifying in ${ this.state.notifySeconds } seconds`
+            notifyMessage : `Notifying in ${ this.state.notifySeconds } seconds`
         })
        
     }
@@ -280,14 +279,12 @@ export default class MapComponent extends Component {
         this.popupDialog.show();
 
         let notifyTimer = setInterval (() => {
-            if (this.state.notifySeconds > 0) {
+            if (this.state.notifySeconds > 0)
                 this.setState ({
                     notifySeconds : this.state.notifySeconds - 1,
                     notifyMessage : `Notifying in ${ this.state.notifySeconds } seconds`
                 })
-
-                console.log (this.state.notifyMessage);
-            } else {
+            else {
                 this.popupDialog.dismiss ();
                 console.log ("TIME IS ZERO");
                 PreventanylNotifications.notifyAngels ();
