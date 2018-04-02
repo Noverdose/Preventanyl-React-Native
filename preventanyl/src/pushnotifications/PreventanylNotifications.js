@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { genericErrorAlert } from '../utils/genericAlerts';
+import { genericErrorAlert, notifyAngelAlert } from '../utils/genericAlerts';
 
 import { getCurrentLocation, convertLocationToLatitudeLongitude } from '../utils/location';
 
@@ -18,6 +18,8 @@ export default class PreventanylNotifications {
             url = `https://preventanyl.com/regionfinder.php?id=${ overdose.id }&lat=${ overdose.latlng.latitude }&long=${ overdose.latlng.longitude }`
             Database.addItemWithChildId (Database.firebaseRefs.overdosesRef, overdose.generateOverdoseForStorage ())
             console.log (url);
+
+            notifyAngelAlert ();
 
         }, (error) => {
             console.log (error);

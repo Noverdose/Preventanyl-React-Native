@@ -13,6 +13,7 @@ import PreventanylNotifications from '../../pushnotifications/PreventanylNotific
 
 import { convertLocationToLatitudeLongitude, getCurrentLocation, getCurrentLocationAsync, setupLocation } from '../../utils/location';
 import { formatDateTime } from '../../utils/localTimeHelper';
+import { formatAddressObjectForMarker } from '../../utils/strings';
 import { genericErrorAlert } from '../../utils/genericAlerts';
 import { generateAppleMapsUrl } from '../../utils/linkingUrls';
 
@@ -128,6 +129,7 @@ export default class MapComponent extends Component {
                             {
                                 title : kit.displayName,
                                 description : kit.comments,
+                                formattedDescription : formatAddressObjectForMarker (kit.address),
                                 latlng : {
                                     latitude : kit.coordinates.lat,
                                     longitude : kit.coordinates.long,
@@ -139,9 +141,11 @@ export default class MapComponent extends Component {
                     }
                 )
                     
-                this.setState ({
-                    staticKits : staticKits
-                });
+                this.setState (
+                    {
+                        staticKits : staticKits
+                    }
+                );
                 
             })
 
@@ -331,6 +335,7 @@ export default class MapComponent extends Component {
                         <Text>{ this.state.notifyTitle }</Text>
                     </View>
                 </PopupDialog> */}
+                
                 <GenericPopupDialog 
                     title = { notifyTitle } 
                     message = { this.state.notifyMessage } 
@@ -347,6 +352,7 @@ export default class MapComponent extends Component {
                             this.popupDialog.dismiss (); 
                         }
                     } />
+
                 <MapView 
                     style = { styles.map }
                     initialRegion = { this.state.region }
@@ -371,7 +377,8 @@ export default class MapComponent extends Component {
                         <MapView.Marker 
                             coordinate  = { this.state.userLocation.latlng } 
                             title       = "Current position"
-                            description = "You are here" />
+                            description = "You are here"
+                            image       = { require('../../../assets/location-pin.imageset/location-pin-1.png') } />
                     }
 
                     {
@@ -381,12 +388,14 @@ export default class MapComponent extends Component {
                                 key         = { index }
                                 coordinate  = { marker.latlng }
                                 title       = { marker.title }
-                                description = { marker.description } >
+                                description = { marker.formattedDescription }
+                                image       = { require('../../../assets/needle.imageset/needle-red.png') } >
+
                                 <MapCallout 
                                     title = { marker.title }
-                                    description = { marker.description }
-                                    url = { generateAppleMapsUrl ( this.state.userLocation.latlng, marker.latlng ) }
-                                />
+                                    description = { marker.formattedDescription }
+                                    url = { generateAppleMapsUrl ( this.state.userLocation.latlng, marker.latlng ) } />
+                                
                             </MapView.Marker>
                         ))
                     }

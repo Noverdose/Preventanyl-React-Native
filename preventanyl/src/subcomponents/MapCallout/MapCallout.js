@@ -28,8 +28,8 @@ export default class MapCallout extends Component {
         if (Platform.OS === 'ios') {
             return (
                 <MapView.Callout>
-                    <Text>{ this.props.title }</Text>
-                    <Text>{ wordWrap (this.props.description, 40) }</Text>
+                    <Text style = { styles.headerText } >{ this.props.title }</Text>
+                    <Text>{ wordWrap (this.props.description, 50) }</Text>
                     <TouchableOpacity onPress = { () => {
                         let url = this.props.url;
                         console.log (url);
@@ -74,5 +74,11 @@ export default class MapCallout extends Component {
     }
 
 }
+
+const styles = StyleSheet.create ({
+    headerText : {
+        fontWeight: 'bold'
+    }
+})
 
 AppRegistry.registerComponent ('MapCallout', () => MapCallout);

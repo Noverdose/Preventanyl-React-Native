@@ -1,5 +1,7 @@
 import { Alert } from 'react-native';
 
+const ANGELS_TITLE = "Notifying";
+const ANGELS_MESSAGE = "Nearby helpers have been notified";
 const ERROR_TITLE = "Whoops!";
 const REQUIRED_FIELD_TITLE = "Required Field";
 const RESEND_EMAIL = "Resend email";
@@ -40,6 +42,10 @@ export const genericErrorDescriptionAlert = (error) => {
 
 export const genericRequiredFieldAlert = (field) => {
     genericAlert (REQUIRED_FIELD_TITLE, `Please enter a ${field}`);
+}
+
+export const notifyAngelAlert = () => {
+    genericAlert (ANGELS_TITLE, ANGELS_MESSAGE);
 }
 
 export const genericVerificationAlert = (title, message) => {
