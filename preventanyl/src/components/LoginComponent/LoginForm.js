@@ -25,8 +25,7 @@ export default class LoginForm extends Component {
             <View style = { styles.container }>
 
                 <StatusBar 
-                    barStyle = 'light-content'
-                />
+                    barStyle = 'light-content' />
 
                     <TextInput
                         placeholder = 'username or email'
