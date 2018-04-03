@@ -16,6 +16,7 @@ export const displayErrors = Object.freeze (
 )
 
 export const generateAppleMapsUrl = (source, dest) => {
+    console.log ('dest', dest);
     return `http://maps.apple.com/?saddr=${ source.latitude },${ source.longitude }&daddr=${ dest.latitude },${ dest.longitude }`
 }
 

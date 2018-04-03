@@ -20,7 +20,7 @@ import { generateAppleMapsUrl } from '../../utils/linkingUrls';
 import GenericPopupDialog from '../../utils/GenericPopupDialog';
 import MapCallout from '../../subcomponents/MapCallout/MapCallout';
 
-import Overdose from '../../objects/Overdose';
+import StaticKit from '../../objects/StaticKit';
 
 import App from '../../../App';
 
@@ -127,20 +127,9 @@ export default class MapComponent extends Component {
             await this.simpleLoadingFunction ( async () => {
                 let staticKits = [];
 
-                kits.map ( (kit) => {
-                        staticKits.push (
-                            {
-                                title : kit.displayName,
-                                description : kit.comments,
-                                formattedDescription : formatAddressObjectForMarker (kit.address),
-                                latlng : {
-                                    latitude : kit.coordinates.lat,
-                                    longitude : kit.coordinates.long,
-                                },
-                                id  : kit.id,
-                                key : kit.id
-                            }
-                        )
+                staticKits = kits.map ( (kit) => 
+                    {
+                        return StaticKit.generateOverdoseFromSnapshot (kit);
                     }
                 )
                     
