@@ -12,7 +12,7 @@ import Database from '../../database/Database'
 import PreventanylNotifications from '../../pushnotifications/PreventanylNotifications';
 
 import { convertLocationToLatitudeLongitude, getCurrentLocation, getCurrentLocationAsync, setupLocation } from '../../utils/location';
-import { formatDateTime } from '../../utils/localTimeHelper';
+import { formatDateTime, compareDiffHoursNow, getMomentNow, getMomentNowSubtractHours } from '../../utils/localTimeHelper';
 import { formatAddressObjectForMarker } from '../../utils/strings';
 import { genericErrorAlert } from '../../utils/genericAlerts';
 import { generateAppleMapsUrl } from '../../utils/linkingUrls';
@@ -24,7 +24,9 @@ import Overdose from '../../objects/Overdose';
 
 import App from '../../../App';
 
-const notifyTitle = "Notify Angels";
+const notifyTitle                  = "Notify Angels";
+const HELP_COOL_DOWN               = 0.166667;
+const HELP_COOL_DOWN_ERROR_MESSAGE = `Please wait ${ Math.round (HELP_COOL_DOWN * 60) } minutes before asking for help again`;
 
 export default class MapComponent extends Component {
 
@@ -44,10 +46,11 @@ export default class MapComponent extends Component {
                 },
                 error : null,
             },
-            isLoading     : false,
+            isLoading       : false,
             notifyMessage   : 'Notifying in 5 seconds',
-            notifySeconds : 5,
-            notifyTimer   : null
+            notifySeconds   : 5,
+            notifyTimer     : null,
+            notifyTimestamp : getMomentNowSubtractHours (2)
         }
 
         this.setInitialRegionState ();
@@ -280,6 +283,13 @@ export default class MapComponent extends Component {
 
         this.resetHelpTimer ();
 
+        console.log (compareDiffHoursNow (this.state.notifyTimestamp));
+
+        if (compareDiffHoursNow (this.state.notifyTimestamp) < HELP_COOL_DOWN) {
+            genericErrorAlert (HELP_COOL_DOWN_ERROR_MESSAGE);
+            return;
+        }
+
         this.popupDialog.show();
 
         let notifyTimer = setInterval (() => {
@@ -296,9 +306,12 @@ export default class MapComponent extends Component {
             }
         }, 1000);
 
-        this.setState ({
-            notifyTimer : notifyTimer
-        })
+        this.setState (
+            {
+                notifyTimer     : notifyTimer,
+                notifyTimestamp : getMomentNow ()
+            }
+        )
         
     }
 

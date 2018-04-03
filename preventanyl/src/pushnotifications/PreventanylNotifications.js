@@ -12,11 +12,15 @@ export default class PreventanylNotifications {
     static notifyAngels = async () => {
         getCurrentLocation ( (result) => {
             location = convertLocationToLatitudeLongitude (result);
-            console.log (location);
+            
+            // console.log (location);
+            
             overdose = Overdose.generateOverdoseFromLocation (location)
-            console.log (overdose)
+            // console.log (overdose)
+            
             url = `https://preventanyl.com/regionfinder.php?id=${ overdose.id }&lat=${ overdose.latlng.latitude }&long=${ overdose.latlng.longitude }`
             Database.addItemWithChildId (Database.firebaseRefs.overdosesRef, overdose.generateOverdoseForStorage ())
+            
             console.log (url);
 
             notifyAngelAlert ();

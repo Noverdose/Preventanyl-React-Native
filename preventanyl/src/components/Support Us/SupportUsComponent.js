@@ -27,7 +27,7 @@ export default class SupportUsComponent extends Component {
                 onNavigationStateChange = { (event) => 
                     {
                         if (event.url !== uri) {
-                            this.webview.stopLoading();
+                            this.webview.stopLoading ();
                             openWebPage (event.url);
                         }
                     }
