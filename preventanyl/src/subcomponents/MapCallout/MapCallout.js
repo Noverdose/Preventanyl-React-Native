@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { AppRegistry, Image, Linking, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { AppRegistry, Image, Platform, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 import LocationHelper from '../../utils/location';
 
@@ -29,15 +29,14 @@ export default class MapCallout extends Component {
             return (
                 <MapView.Callout>
                     <Text style = { styles.headerText } >{ this.props.title }</Text>
-                    <Text>{ wordWrap (this.props.description, 50) }</Text>
+                    <Text>{ wordWrap (this.props.description, 50) } </Text>
                     <TouchableOpacity onPress = { () => {
                         let url = this.props.url;
-                        console.log (url);
+                        
                         if (LocationHelper.locationEnabled && url != '')
                             openMaps (url);
-                        else {
+                        else
                             genericErrorAlert (NO_USERLOCAION_AVAILABLE_ERROR_MESSAGE);
-                        }
                      } }>
                         <Image
                             source = {
@@ -58,9 +57,8 @@ export default class MapCallout extends Component {
                         console.log (url);
                         if (LocationHelper.locationEnabled && url != '')
                             openMaps (url);
-                        else {
+                        else
                             genericErrorAlert (NO_USERLOCAION_AVAILABLE_ERROR_MESSAGE);
-                        }
                      } }>
                         <Image
                             source = {
