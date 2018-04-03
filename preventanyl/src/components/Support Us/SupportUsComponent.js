@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import { AppRegistry, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View, WebView } from 'react-native';
-
-import DismissKeyboard from 'dismissKeyboard';
+import { AppRegistry, WebView } from 'react-native';
 
 import { openWebPage } from '../../utils/linkingUrls';
 
