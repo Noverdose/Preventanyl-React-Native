@@ -41,7 +41,7 @@ export const whiteSpaceFind = (x) => {
 };
 
 export const formatAddressObjectForMarker = (address) => {
-    return `${ address.city }\n${ address.streetAddress }`
+    return `${ address.city }\n${ address.streetAddress }\n${ address.postalCode }`;
 }
 
 export const formatAddressObject = (address) => {
