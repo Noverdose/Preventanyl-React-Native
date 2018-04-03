@@ -64,31 +64,6 @@ export const notifyAngelAlert = () => {
 }
 
 export const genericVerificationAlert = (title, message) => {
-    if (!Database.checkUserVerfied ()) {
-        Alert.alert (
-            title,
-            message,
-            [
-                {
-                    text : RESEND_EMAIL, onPress : () => {
-                        Database.sendVerificationEmail ();
-                    }
-                },
-                {
-                    text : OKAY, onPress : () => {
-                        console.log ('Okay pressed');
-                    }
-                }
-            ]
-        );
-    }
-}
-
-export const genericDefaultAlert = () => {
-    genericAlert (DEFAULT_TITLE, DEFAULT_MESSAGE)
-}
-
-export const genericVerificationAlert = (title, message) => {
     if (title === "" || message === "")
         return;
 
@@ -103,4 +78,8 @@ export const genericVerificationAlert = (title, message) => {
             GENERIC_ALERT_OBJECTS.UNDISSMISSABLE
         );
     }
+}
+
+export const genericDefaultAlert = () => {
+    genericAlert (DEFAULT_TITLE, DEFAULT_MESSAGE)
 }

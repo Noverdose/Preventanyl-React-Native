@@ -298,7 +298,6 @@ export default class MapComponent extends Component {
         this.setState (
             {
                 notifyTimer     : notifyTimer,
-                notifyTimestamp : getMomentNow ()
             }
         )
         
@@ -347,10 +346,17 @@ export default class MapComponent extends Component {
                         console.log ("Cancelling Popup")
                         this.resetHelpTimer ();
                     }}
-                    actionFunction = { () => { 
+                    actionFunction = { () => 
+                        { 
                             console.log ("Notifying Angels");
                             PreventanylNotifications.notifyAngels ();
                             this.resetHelpTimer ();
+                            this.setState (
+                                {
+                                    notifyTimestamp : getMomentNow ()
+                                }
+                            )
+
                             this.popupDialog.dismiss (); 
                         }
                     } />
