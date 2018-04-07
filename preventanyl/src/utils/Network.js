@@ -3,6 +3,8 @@ import React from 'react';
 import { NetInfo } from 'react-native';
 
 import { genericErrorMessageAlert } from './genericAlerts';
+import { EFAULT } from 'constants';
+import { fail } from 'assert';
 
 // Wrapper for NetInfo, for more details visit https://facebook.github.io/react-native/docs/netinfo.html
 
@@ -92,6 +94,7 @@ export default class Network {
             {
                 console.log (error);
                 genericErrorMessageAlert (new Error (Network.errorMessages.NO_INTERNET_CONNECTION));
+                failureCallback (error);
             }
         )
     }
@@ -115,7 +118,7 @@ export default class Network {
                 Network.setConnectionObject (true, connectionInfo.type)
             }, (error) => 
             {
-                Network.setConnectionObject (false, connectionInfo.type)
+                Network.setConnectionObject (false, Network.errorMessages.NONE);
             }
         );
 
