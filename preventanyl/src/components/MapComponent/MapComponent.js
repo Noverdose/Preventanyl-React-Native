@@ -131,6 +131,7 @@ export default class MapComponent extends Component {
 
         App.addResumeFunction ( () => 
             {
+
                 Network.checkNetworkConnection ( (connectionInfo) => 
                     {
                         Network.changeNetworkStatus ();
@@ -143,6 +144,7 @@ export default class MapComponent extends Component {
                         notifyAngelErrorAlert ();
                     }
                 )
+
             }
         )
 
@@ -355,9 +357,11 @@ export default class MapComponent extends Component {
 
             // Center on user position
             this.map.animateToRegion (this.state.region);
-        }, (error) => {
-            genericErrorAlert ("Failed to find user");
-        });
+        }, (error) => 
+            {
+                genericErrorAlert ("Failed to find user");
+            }
+        );
 
     }
 
