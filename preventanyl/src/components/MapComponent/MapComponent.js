@@ -132,22 +132,7 @@ export default class MapComponent extends Component {
         App.addResumeFunction ( () => 
             {
 
-                Network.checkNetworkConnection ( (connectionInfo) => 
-                    {
-                        Network.changeNetworkStatus ();
-                    },
-                    (connectionInfo) => {
-                        Network.changeNetworkStatus ();
-                    },
-                    (error) => {
-                        Network.changeNetworkStatus ();
-                    },
-                    (error) => 
-                    {
-                        Network.setConnectionObject (false, Network.errorMessages.NONE)
-                    }
-                )
-
+                Network.changeNetworkStatus    ();
                 Network.setupNetworkConnection ();
                 
             }
