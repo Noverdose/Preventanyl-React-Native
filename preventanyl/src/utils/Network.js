@@ -3,8 +3,6 @@ import React from 'react';
 import { NetInfo } from 'react-native';
 
 import { genericErrorMessageAlert } from './genericAlerts';
-import { EFAULT } from 'constants';
-import { fail } from 'assert';
 
 // Wrapper for NetInfo, for more details visit https://facebook.github.io/react-native/docs/netinfo.html
 
@@ -77,10 +75,13 @@ export default class Network {
         Network.listenerFunctions[eventName] = [];
     }
 
-    static checkNetworkConnection (successMobileCallback, successWifiCallback, failureCallback) {
+    static checkNetworkConnection (successMobileCallback, successWifiCallback, noInternetConnectionCallback, failureCallback) {
         Network.genericGetConnectionStatus ( (connectionInfo) => 
             {
-                if (connectionInfo.type === Network.ConnectionTypes.NONE || connectionInfo.type === Network.ConnectionTypes.UNKNOWN)
+                if (connectionInfo.type === Network.ConnectionTypes.NONE)
+                    noInternetConnectionCallback (new Error (Network.errorMessages.NO_INTERNET_CONNECTION))
+
+                else if (connectionInfo.type === Network.ConnectionTypes.UNKNOWN)
                     failureCallback (new Error (Network.errorMessages.NO_INTERNET_CONNECTION))
 
                 // can use EffectiveConnectionType Enum to extrapolate more information such as 2g, 3g, 4g, unknown
@@ -93,7 +94,6 @@ export default class Network {
         ,(error) => 
             {
                 console.log (error);
-                genericErrorMessageAlert (new Error (Network.errorMessages.NO_INTERNET_CONNECTION));
                 failureCallback (error);
             }
         )
@@ -118,7 +118,11 @@ export default class Network {
                 Network.setConnectionObject (true, connectionInfo.type)
             }, (error) => 
             {
-                Network.setConnectionObject (false, Network.errorMessages.NONE);
+                Network.setConnectionObject (false, Network.errorMessages.NONE)
+                genericErrorMessageAlert (new Error (Network.errorMessages.NO_INTERNET_CONNECTION));
+            }, (error) => 
+            {
+                Network.setConnectionObject (false, Network.errorMessages.NONE)
             }
         );
 

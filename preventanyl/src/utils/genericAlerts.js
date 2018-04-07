@@ -62,7 +62,7 @@ export const genericErrorDescriptionAlert = (error) => {
 }
 
 export const genericRequiredFieldAlert = (field) => {
-    genericAlert (REQUIRED_FIELD_TITLE, `Please enter a ${field}`);
+    genericAlert (REQUIRED_FIELD_TITLE, `Please enter a ${ field }`);
 }
 
 export const notifyAngelAlert = () => {

@@ -140,11 +140,22 @@ export default class MapComponent extends Component {
                         Network.changeNetworkStatus ();
                     },
                     (error) => {
-                        Network.setConnectionObject (false, Network.ConnectionTypes.NONE);
-                        notifyAngelErrorAlert ();
+                        Network.changeNetworkStatus ();
+                    },
+                    (error) => 
+                    {
+                        Network.setConnectionObject (false, Network.errorMessages.NONE)
                     }
                 )
 
+                Network.setupNetworkConnection ();
+                
+            }
+        )
+
+        App.addPauseFunction ( () => 
+            {
+                Network.genericRemoveAllListeners (Network.eventTypes.CONNECTION_CHANGE);
             }
         )
 
