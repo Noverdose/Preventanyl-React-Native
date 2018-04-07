@@ -4,17 +4,16 @@ import { AppRegistry, Text, View, TouchableOpacity, StyleSheet, Image } from 're
 import MapView, { AnimatedRegion, Animated } from 'react-native-maps';
 import Spinner from 'react-native-loading-spinner-overlay';
 
-import * as firebase from 'firebase';
-
 import Database from '../../database/Database'
 import PreventanylNotifications from '../../pushnotifications/PreventanylNotifications';
 
 import { convertLocationToLatitudeLongitude, getCurrentLocation, getCurrentLocationAsync, setupLocation } from '../../utils/location';
 import { formatDateTime, compareDiffHoursNow, getMomentNow, getMomentNowSubtractHours } from '../../utils/localTimeHelper';
 import { formatAddressObjectForMarker } from '../../utils/strings';
-import { genericErrorAlert } from '../../utils/genericAlerts';
+import { genericErrorAlert, notifyAngelErrorAlert } from '../../utils/genericAlerts';
 import { generateAppleMapsUrl } from '../../utils/linkingUrls';
 
+import Network from '../../utils/Network';
 import GenericPopupDialog from '../../utils/GenericPopupDialog';
 import MapCallout from '../../subcomponents/MapCallout/MapCallout';
 
@@ -64,20 +63,24 @@ export default class MapComponent extends Component {
             async (position) => {
                 // console.log (position)
 
-                this.setState ({
-                    userLocation : {
-                        latlng : {
-                            latitude  : position.coords.latitude,
-                            longitude : position.coords.longitude,
-                        },
-                        error     : null,
+                this.setState (
+                    {
+                        userLocation : {
+                            latlng : {
+                                latitude  : position.coords.latitude,
+                                longitude : position.coords.longitude,
+                            },
+                            error     : null,
+                        }
                     }
-                });
+                );
 
             },
-            (error) => this.setState ( {
-                error : error.message
-            }),
+            (error) => this.setState ( 
+                {
+                    error : error.message
+                }
+            ),
             { 
                 enableHighAccuracy : true,
                 timeout : 20000,
@@ -100,23 +103,47 @@ export default class MapComponent extends Component {
             }
         );
 
+        Network.setupNetworkConnection ();
+
         this.watchLocation ();
 
         // Could clear by adding to pauseFunctions however it is being cleared in componentWillUnmount
-        App.addResumeFunction ( () => {
+        App.addResumeFunction ( () => 
+            {
 
-            setupLocation ( (result) => {
+                setupLocation ( (result) => {
 
-                this.convertLocationMount (result, (location) => {
-                    console.log ('location ,', location);
-                })
-            
-                this.watchLocation ();
-            }, (error) => {
-                console.log (error);
-            })
+                    this.convertLocationMount (result, (location) => 
+                        {
+                            console.log ('location ,', location);
+                        }
+                    )
+                    
+                    this.watchLocation ();
+                }, (error) => 
+                    {
+                        console.log (error);
+                    }
+                )
 
-        });
+            }
+        );
+
+        App.addResumeFunction ( () => 
+            {
+                Network.checkNetworkConnection ( (connectionInfo) => 
+                    {
+                        Network.changeNetworkStatus ();
+                    },
+                    (connectionInfo) => {
+                        Network.changeNetworkStatus ();
+                    },
+                    (error) => {
+                        Network.setConnectionObject (false, Network.ConnectionTypes.NONE);
+                    }
+                )
+            }
+        )
 
 
         // For Future, do this on load, and afterwards check for change for efficency
@@ -166,9 +193,11 @@ export default class MapComponent extends Component {
             --MapComponent.spinnerFunctionsLoading;
 
             if (MapComponent.spinnerFunctionsLoading === 0 && this.mounted)
-                this.setState ({
-                    isLoading : false
-                })
+                this.setState (
+                    {
+                        isLoading : false
+                    }
+                )
 
         }
 
@@ -238,18 +267,22 @@ export default class MapComponent extends Component {
     setInitialRegionState() {
 
         this.setupRegionCurrentLocation ( (result) => {
-            this.setState ({
-                region : result
-            });
-        }, (error) => {
-            this.setState ({
-                region : {
-                    latitude: 49.246292,
-                    longitude: -123.116226,
-                    latitudeDelta: 0.2,
-                    longitudeDelta: 0.2,
+            this.setState (
+                {
+                    region : result
                 }
-            });
+            );
+        }, (error) => {
+            this.setState (
+                {
+                    region : {
+                        latitude: 49.246292,
+                        longitude: -123.116226,
+                        latitudeDelta: 0.2,
+                        longitudeDelta: 0.2,
+                    }
+                }
+            );
         });
 
     }
@@ -259,16 +292,23 @@ export default class MapComponent extends Component {
         if (this.state.notifyTimer != null)
             clearInterval (this.state.notifyTimer);
 
-        this.setState ({
-            notifySeconds : 5,
-            notifyMessage : `Notifying in ${ this.state.notifySeconds } seconds`
-        })
+        this.setState (
+            {
+                notifySeconds : 5,
+                notifyMessage : `Notifying in ${ this.state.notifySeconds } seconds`
+            }
+        )
        
     }
 
     helpMe () {
 
         this.resetHelpTimer ();
+
+        if (!Network.connectionObject.connected) {
+            notifyAngelErrorAlert ();
+            return;
+        }
 
         console.log (compareDiffHoursNow (this.state.notifyTimestamp));
 
@@ -281,15 +321,15 @@ export default class MapComponent extends Component {
 
         let notifyTimer = setInterval (() => {
             if (this.state.notifySeconds > 0)
-                this.setState ({
-                    notifySeconds : this.state.notifySeconds - 1,
-                    notifyMessage : `Notifying in ${ this.state.notifySeconds } seconds`
-                })
+                this.setState (
+                    {
+                        notifySeconds : this.state.notifySeconds - 1,
+                        notifyMessage : `Notifying in ${ this.state.notifySeconds } seconds`
+                    }
+                )
             else {
-                this.popupDialog.dismiss ();
                 console.log ("TIME IS ZERO");
-                PreventanylNotifications.notifyAngels ();
-                clearInterval (this.state.notifyTimer);
+                this.notfiyAngelsWithUpdates ();
             }
         }, 1000);
 
@@ -304,9 +344,11 @@ export default class MapComponent extends Component {
     findMe () {
 
         this.createRegionCurrentLocation ((region) => {
-            this.setState ({
-                region : region
-            })
+            this.setState (
+                {
+                    region : region
+                }
+            )
 
             // Center on user position
             this.map.animateToRegion (this.state.region);
@@ -314,6 +356,26 @@ export default class MapComponent extends Component {
             genericErrorAlert ("Failed to find user");
         });
 
+    }
+
+    notfiyAngelsWithUpdates () {
+        console.log ("Notifying Angels");
+        this.resetHelpTimer ();
+        PreventanylNotifications.notifyAngels ( () => 
+            {
+
+                this.setState (
+                    {
+                        notifyTimestamp : getMomentNow ()
+                    }
+                )        
+            }, (error) => 
+            {
+                console.log (error);
+            }
+        );
+
+        this.popupDialog.dismiss ();
     }
 
     render () {
@@ -340,22 +402,16 @@ export default class MapComponent extends Component {
                     message = { this.state.notifyMessage } 
                     ref = { (popupDialog) => { this.popupDialog = popupDialog; } } 
                     actionButtonText = "Notify Angels"
-                    cancelFunction = { () => {
-                        console.log ("Cancelling Popup")
-                        this.resetHelpTimer ();
-                    }}
+                    cancelFunction = { () => 
+                        {
+                            console.log ("Cancelling Popup")
+                            this.resetHelpTimer ();
+                        }
+                    }
                     actionFunction = { () => 
                         { 
                             console.log ("Notifying Angels");
-                            PreventanylNotifications.notifyAngels ();
-                            this.resetHelpTimer ();
-                            this.setState (
-                                {
-                                    notifyTimestamp : getMomentNow ()
-                                }
-                            )
-
-                            this.popupDialog.dismiss (); 
+                            this.notfiyAngelsWithUpdates ();
                         }
                     } />
 

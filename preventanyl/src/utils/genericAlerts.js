@@ -2,6 +2,7 @@ import { Alert } from 'react-native';
 
 const ANGELS_TITLE          = "Notifying";
 const ANGELS_MESSAGE        = "Nearby helpers have been notified";
+const ANGELS_ERROR_NOTIFY   = "Please check your network connection\nIt is required to notify them";
 const ERROR_TITLE           = "Whoops!";
 const REQUIRED_FIELD_TITLE  = "Required Field";
 const RESEND_EMAIL          = "Resend email";
@@ -48,6 +49,10 @@ export const genericErrorAlert = (message) => {
     genericAlert(ERROR_TITLE, message);
 }
 
+export const genericErrorMessageAlert = (error) => {
+    genericAlert(ERROR_TITLE, error.message);
+}
+
 export const genericErrorDescriptionAlert = (error) => {
     if (error === undefined || error === undefined || typeof error === "string")
         return;
@@ -61,6 +66,10 @@ export const genericRequiredFieldAlert = (field) => {
 
 export const notifyAngelAlert = () => {
     genericAlert (ANGELS_TITLE, ANGELS_MESSAGE);
+}
+
+export const notifyAngelErrorAlert = () => {
+    genericErrorAlert (ANGELS_ERROR_NOTIFY);
 }
 
 export const genericVerificationAlert = (title, message) => {

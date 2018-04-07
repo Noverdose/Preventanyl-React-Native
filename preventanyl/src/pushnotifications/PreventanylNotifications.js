@@ -1,15 +1,24 @@
 import React from 'react';
 
-import { genericErrorAlert, notifyAngelAlert } from '../utils/genericAlerts';
+import { genericErrorAlert, notifyAngelAlert, notifyAngelErrorAlert } from '../utils/genericAlerts';
 
 import { getCurrentLocation, convertLocationToLatitudeLongitude } from '../utils/location';
+
+import Network from '../utils/Network';
 
 import Database from '../database/Database';
 import Overdose from '../objects/Overdose';
 
 export default class PreventanylNotifications {
 
-    static notifyAngels = async () => {
+    static notifyAngels = async (successCallback, failureCallback) => {
+
+        if (!Network.connectionObject.connected) {
+            notifyAngelErrorAlert ();
+            failureCallback (new Error (Network.errorMessages.NO_INTERNET_CONNECTION));
+            return;
+        }
+
         getCurrentLocation ( (result) => {
             location = convertLocationToLatitudeLongitude (result);
             
@@ -25,10 +34,16 @@ export default class PreventanylNotifications {
 
             notifyAngelAlert ();
 
-        }, (error) => {
-            console.log (error);
-            genericErrorAlert ('unable to notify nearby, please check network connection and gps');
-        })      
+            // No need to send location result back as it is not useful information
+            successCallback ();
+
+        }, (error) => 
+            {
+                console.log (error);
+                failureCallback (error);
+                genericErrorAlert ('unable to notify nearby, please check network connection and gps');
+            }
+        )      
        
     }
 

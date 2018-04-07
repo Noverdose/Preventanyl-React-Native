@@ -5,15 +5,19 @@ import { genericErrorAlert } from './genericAlerts';
 
 export default class ExpoPermissionsHandler {
 
-    static permissionStates = Object.freeze ({
-        "GRANTED"   : "granted",
-    })
+    static permissionStates = Object.freeze (
+        {
+            "GRANTED"   : "granted",
+        }
+    )
 
-    static errorMessages = Object.freeze ({
-        "LOCATION_DENIED"          : 'You cannot access the entire features of the app without location' ,
-        'NOTIFICATIONS_DENIED'     : 'You cannot help anybody that well without notifications :(',
-        'GENERIC_PERMISSION_ERROR' : 'Permission not granted'
-    })
+    static errorMessages = Object.freeze (
+        {
+            "LOCATION_DENIED"          : 'You cannot access the entire features of the app without location' ,
+            'NOTIFICATIONS_DENIED'     : 'You cannot help anybody that well without notifications :(',
+            'GENERIC_PERMISSION_ERROR' : 'Permission not granted'
+        }
+    )
 
     static async genericCheckPermission (permission, errorMessage, successCallback, failureCallback) {
         const { status } = await Permissions.getAsync (permission)

@@ -16,20 +16,24 @@ const firebaseApp = firebase.initializeApp (config);
 
 export default class Database {
 
-    static firebaseRefs = Object.freeze ({
-        "staticKitsRef"    : firebase.database ().ref ('statickits'),
-        "overdosesRef"     : firebase.database ().ref ('overdoses'),
-        "usersRef"         : firebase.database ().ref ().child ("user"),
-        "userLocationsRef" : firebase.database().ref ().child ("userLocations")
-    })
+    static firebaseRefs = Object.freeze (
+        {
+            "staticKitsRef"    : firebase.database ().ref ('statickits'),
+            "overdosesRef"     : firebase.database ().ref ('overdoses'),
+            "usersRef"         : firebase.database ().ref ().child ("user"),
+            "userLocationsRef" : firebase.database().ref ().child ("userLocations")
+        }
+    )
 
     static currentUser = undefined;
 
-    static firebaseEventTypes = Object.freeze ({
-        "Added"   : "child_added",
-        "Changed" : "child_changed",
-        "Removed" : "child_removed"
-    })
+    static firebaseEventTypes = Object.freeze (
+        {
+            "Added"   : "child_added",
+            "Changed" : "child_changed",
+            "Removed" : "child_removed"
+        }
+    )
 
     static genericListenForItems (itemsRef, callback) {
         let items = [];
@@ -46,7 +50,7 @@ export default class Database {
 
     static genericListenForItem (itemsRef, eventType, callback) {
         // retrieve the last record from `itemsRef`
-        return itemsRef.limitToLast(1).on(eventType, function(snapshot) {
+        return itemsRef.limitToLast(1).on(eventType, (snapshot) => {
 
             let val = snapshot.val ();
 
