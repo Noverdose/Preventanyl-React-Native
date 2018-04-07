@@ -1,17 +1,18 @@
 import { Alert } from 'react-native';
 
-const ANGELS_TITLE          = "Notifying";
-const ANGELS_MESSAGE        = "Nearby helpers have been notified";
-const ANGELS_ERROR_NOTIFY   = "Please check your network connection\nIt is required to notify them";
-const ERROR_TITLE           = "Whoops!";
-const REQUIRED_FIELD_TITLE  = "Required Field";
-const RESEND_EMAIL          = "Resend email";
-const DEFAULT_TITLE         = "TITLE";
-const DEFAULT_MESSAGE       = "MESSAGE";
-const CONFIRMATION_TITLE    = "Confirmation required";
-const OKAY                  = "Okay";
-const ACCEPT                = "Accept";
-const CANCEL                = "Cancel";
+const ANGELS_TITLE                = "Notifying";
+const ANGELS_MESSAGE              = "Nearby helpers have been notified";
+const ANGELS_ERROR_NOTIFY         = "Please check your network connection\nIt is required to notify them";
+const NOTIFY_ANGELS_ERROR_MESSAGE = "Unable to notify nearby, please check network connection and gps"
+const ERROR_TITLE                 = "Whoops!";
+const REQUIRED_FIELD_TITLE        = "Required Field";
+const RESEND_EMAIL                = "Resend email";
+const DEFAULT_TITLE               = "TITLE";
+const DEFAULT_MESSAGE             = "MESSAGE";
+const CONFIRMATION_TITLE          = "Confirmation required";
+const OKAY                        = "Okay";
+const ACCEPT                      = "Accept";
+const CANCEL                      = "Cancel";
 
 export const GENERIC_ALERT_OBJECTS = Object.freeze (
     {
@@ -70,6 +71,10 @@ export const notifyAngelAlert = () => {
 
 export const notifyAngelErrorAlert = () => {
     genericErrorAlert (ANGELS_ERROR_NOTIFY);
+}
+
+export const notifyAngelErrorAlertUnknown = () => {
+    genericErrorAlert (NOTIFY_ANGELS_ERROR_MESSAGE);
 }
 
 export const genericVerificationAlert = (title, message) => {

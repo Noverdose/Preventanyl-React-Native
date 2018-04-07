@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { genericErrorAlert, notifyAngelAlert, notifyAngelErrorAlert } from '../utils/genericAlerts';
+import { genericErrorAlert, notifyAngelAlert, notifyAngelErrorAlert, notifyAngelErrorAlertUnknown } from '../utils/genericAlerts';
 
 import { getCurrentLocation, convertLocationToLatitudeLongitude } from '../utils/location';
 
@@ -41,7 +41,7 @@ export default class PreventanylNotifications {
             {
                 console.log (error);
                 failureCallback (error);
-                genericErrorAlert ('unable to notify nearby, please check network connection and gps');
+                notifyAngelErrorAlertUnknown ();
             }
         )      
        

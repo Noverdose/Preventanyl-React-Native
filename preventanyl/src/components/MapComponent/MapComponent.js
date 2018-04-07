@@ -140,6 +140,7 @@ export default class MapComponent extends Component {
                     },
                     (error) => {
                         Network.setConnectionObject (false, Network.ConnectionTypes.NONE);
+                        notifyAngelErrorAlert ();
                     }
                 )
             }
@@ -272,18 +273,20 @@ export default class MapComponent extends Component {
                     region : result
                 }
             );
-        }, (error) => {
-            this.setState (
-                {
-                    region : {
-                        latitude: 49.246292,
-                        longitude: -123.116226,
-                        latitudeDelta: 0.2,
-                        longitudeDelta: 0.2,
+        }, (error) => 
+            {
+                this.setState (
+                    {
+                        region : {
+                            latitude: 49.246292,
+                            longitude: -123.116226,
+                            latitudeDelta: 0.2,
+                            longitudeDelta: 0.2,
+                        }
                     }
-                }
-            );
-        });
+                );
+            }
+        );
 
     }
 
