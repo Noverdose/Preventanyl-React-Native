@@ -34,7 +34,13 @@ export default class GenericPopupDialog extends Component {
                     height = { DIALOG_HEIGHT }
                     dismissOnTouchOutside = { DISMISS_TOUCH_OUTSIDE }
                     actions = { [
-                        <DialogButton key = { 1 } text = { DIALOG_LEFT_BUTTON_TEXT } align = "left" onPress = { () => this.popupDialog.dismiss() } />,
+                        <DialogButton key = { 1 } text = { DIALOG_LEFT_BUTTON_TEXT } align = "left" onPress = { () => {
+                                if (this.props.cancelFunction)
+                                    this.props.cancelFunction ()
+                                    
+                                this.popupDialog.dismiss() 
+                            }
+                        } />,
                         <DialogButton key = { 2 } text = { this.props.actionButtonText } align = "right" onPress = { () => this.props.actionFunction () } />,
                         ] } >
                     <View>

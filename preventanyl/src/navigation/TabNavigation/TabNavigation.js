@@ -6,6 +6,7 @@ import MapComponent from '../../components/MapComponent/MapComponent'
 import ProfileComponent from '../../components/ProfileComponent/ProfileComponent'
 import LoginComponent from '../../components/LoginComponent/LoginComponent'
 import RegisterKitComponent from '../../components/RegisterKitComponent/RegisterKitComponent'
+import SupportUsComponent from '../../components/Support Us/SupportUsComponent';
 
 const TabNavigation = TabNavigator ({
   Map : {
@@ -20,22 +21,26 @@ const TabNavigation = TabNavigator ({
       )
     },
   },
-  Profile : {
-    screen : LoginComponent,
+  Register : {
+    screen : RegisterKitComponent,
     navigationOptions : {
-      tabBarLabel : 'Profile',
-      tabBarIcon  : ({ tintColor }) => (
+      tabBarLabel : 'RegisterKit',
+      tabBarIcon  : (
+        { 
+          tintColor 
+        }
+        ) => (
         <Image 
-          source = { require ('../../../assets/profile.imageset/user_male.png') }
+          source = { require ('../../../assets/address-book.imageset/address_book.png') }
           style  = { [styles.icon, { tintColor : tintColor }]}
         />
       )
     },
   },
-  Register : {
-    screen : RegisterKitComponent,
+  SupportUs : {
+    screen : SupportUsComponent,
     navigationOptions : {
-      tabBarLabel : 'RegisterKit',
+      tabBarLabel : 'Support Us',
       tabBarIcon  : (
         { 
           tintColor 

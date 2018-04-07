@@ -1,11 +1,35 @@
 import { Alert } from 'react-native';
 
-const ERROR_TITLE = "Whoops!";
-const REQUIRED_FIELD_TITLE = "Required Field";
-const RESEND_EMAIL = "Resend email";
-const DEFAULT_TITLE = "TITLE";
-const DEFAULT_MESSAGE = "MESSAGE";
-const OKAY = "Okay";
+const ANGELS_TITLE                = "Notifying";
+const ANGELS_MESSAGE              = "Nearby helpers have been notified";
+const ANGELS_ERROR_NOTIFY         = "Please check your network connection\nIt is required to notify angels";
+const NOTIFY_ANGELS_ERROR_MESSAGE = "Unable to notify nearby, please check network connection and gps"
+const ERROR_TITLE                 = "Whoops!";
+const REQUIRED_FIELD_TITLE        = "Required Field";
+const RESEND_EMAIL                = "Resend email";
+const DEFAULT_TITLE               = "TITLE";
+const DEFAULT_MESSAGE             = "MESSAGE";
+const CONFIRMATION_TITLE          = "Confirmation required";
+const OKAY                        = "Okay";
+const ACCEPT                      = "Accept";
+const CANCEL                      = "Cancel";
+
+export const GENERIC_ALERT_OBJECTS = Object.freeze (
+    {
+        OKAY : {
+            text    : OKAY,
+            onPress : () => {}
+        },
+        CANCEL : {
+            text    : CANCEL,
+            onPress : () => {}
+        },
+        UNDISSMISSABLE : {
+            cancelable : false,
+            onDismiss  : () => {}
+        },
+    }
+)
 
 export const genericAlert = (title, message) => {
 
@@ -15,20 +39,19 @@ export const genericAlert = (title, message) => {
     Alert.alert (
         title, message, 
         [
-            {
-                text : OKAY,
-                onPress : () => {}
-            },
-            {
-                cancelable : false
-            }
-        ]
+            GENERIC_ALERT_OBJECTS.OKAY
+        ],  
+        
     )   
 
 }
 
 export const genericErrorAlert = (message) => {
     genericAlert(ERROR_TITLE, message);
+}
+
+export const genericErrorMessageAlert = (error) => {
+    genericAlert(ERROR_TITLE, error.message);
 }
 
 export const genericErrorDescriptionAlert = (error) => {
@@ -39,26 +62,38 @@ export const genericErrorDescriptionAlert = (error) => {
 }
 
 export const genericRequiredFieldAlert = (field) => {
-    genericAlert (REQUIRED_FIELD_TITLE, `Please enter a ${field}`);
+    genericAlert (REQUIRED_FIELD_TITLE, `Please enter a ${ field }`);
+}
+
+export const genericNotFormattedFieldAlert = (field) => {
+    genericAlert (REQUIRED_FIELD_TITLE, `${ field } is not formatted properly`);
+}
+
+export const notifyAngelAlert = () => {
+    genericAlert (ANGELS_TITLE, ANGELS_MESSAGE);
+}
+
+export const notifyAngelErrorAlert = () => {
+    genericErrorAlert (ANGELS_ERROR_NOTIFY);
+}
+
+export const notifyAngelErrorAlertUnknown = () => {
+    genericErrorAlert (NOTIFY_ANGELS_ERROR_MESSAGE);
 }
 
 export const genericVerificationAlert = (title, message) => {
+    if (title === "" || message === "")
+        return;
+
     if (!Database.checkUserVerfied ()) {
         Alert.alert (
             title,
             message,
             [
-                {
-                    text : RESEND_EMAIL, onPress : () => {
-                        Database.sendVerificationEmail ();
-                    }
-                },
-                {
-                    text : OKAY, onPress : () => {
-                        console.log ('Okay pressed');
-                    }
-                }
-            ]
+                GENERIC_ALERT_OBJECTS.RESEND_EMAIL,
+                GENERIC_ALERT_OBJECTS.OKAY
+            ],
+            GENERIC_ALERT_OBJECTS.UNDISSMISSABLE
         );
     }
 }
