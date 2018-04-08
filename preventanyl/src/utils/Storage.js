@@ -19,7 +19,7 @@ export default class Storage {
 
     static values = Object.freeze (
         {
-            "DISCLAIMER" : {
+            "DISCLAIMER_CLIENT" : {
                 "VALID" : {
                     "ACCEPTED" : "ACCEPTED"
                 }
