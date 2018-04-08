@@ -3,14 +3,14 @@ import { AppRegistry, WebView } from 'react-native';
 
 import Links from '../../utils/Links';
 
-import WebPageComponent from '../WebPageComponent/WebPageComponent';
+import WebPage from '../../subcomponents/WebPage/WebPage';
 
 export default class SupportUsComponent extends Component {
 
     render () {
 
         return (
-            <WebPageComponent
+            <WebPage
                 url = { Links.urls.PAYPAL_ME } />
         );
 

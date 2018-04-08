@@ -3,7 +3,7 @@ import { AppRegistry, WebView } from 'react-native';
 
 import { openWebPage } from '../../utils/linkingUrls';
 
-export default class WebPageComponent extends Component {
+export default class WebPage extends Component {
 
     constructor (props) {
         super (props);
@@ -40,4 +40,4 @@ export default class WebPageComponent extends Component {
 
 }
 
-AppRegistry.registerComponent ('WebPageComponent', () => WebPageComponent);
+AppRegistry.registerComponent ('WebPage', () => WebPage);
