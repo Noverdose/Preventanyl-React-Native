@@ -107,9 +107,9 @@ export default class MapComponent extends Component {
             }, (error) => {
                 genericDisclaimerAlert ( () => 
                     {
-                        Storage.setDisclaimerData (Storage.values.DISCLAIMER.VALID.ACCEPTED, () => 
+                        Storage.setDisclaimerData (Storage.values.DISCLAIMER_CLIENT.VALID.ACCEPTED, () => 
                             {
-                                console.log (Storage.values.DISCLAIMER.VALID.ACCEPTED);
+                                console.log (Storage.values.DISCLAIMER_CLIENT.VALID.ACCEPTED);
                             }
                         ,(error) => 
                             {

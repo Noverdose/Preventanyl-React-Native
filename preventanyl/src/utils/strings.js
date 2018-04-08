@@ -54,6 +54,7 @@ export const splitString = (str, splitNumber, splitChar) => {
 
 }
 
+// Added space at end to not insert character in between postal code
 export const formatAddressObjectForMarker = (address) => {
     return `${ address.city }\n${ address.streetAddress }\n${ splitString (address.postalCode, POSTAL_CODE_SPLIT_NUMBER, ' ') } `;
 }
