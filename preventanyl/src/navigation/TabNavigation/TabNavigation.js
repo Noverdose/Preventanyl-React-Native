@@ -4,13 +4,14 @@ import { Text, View, Image, StyleSheet } from 'react-native';
 
 import MapComponent from '../../components/MapComponent/MapComponent';
 import SupportUsComponent from '../../components/Support Us/SupportUsComponent';
+import RespondingComponent from '../../components/RespondingComponent/RespondingComponent';
 
 const TabNavigation = TabNavigator (
     {
         Map : {
             screen : MapComponent,
             navigationOptions : {
-                tabBarLabel : 'Home',
+                tabBarLabel : 'Map',
                 tabBarIcon  : ( { tintColor } ) => (
                     <Image 
                         source = { require ('../../../assets/map.imageset/map.png') }
@@ -23,6 +24,22 @@ const TabNavigation = TabNavigator (
                             ] 
                         } />
                 )
+            },
+        },
+        Responding : {
+            screen : RespondingComponent,
+            navigationOptions : {
+                tabBarLabel : 'Responding',
+                tabBarIcon  : (
+                    { 
+                        tintColor 
+                    }
+                ) => (
+                <Image 
+                    source = { require ('../../../assets/respond.imageset/respond.png') }
+                    style  = { [styles.icon, { tintColor : tintColor }]}
+                />
+              )
             },
         },
         SupportUs : {
