@@ -7,6 +7,8 @@ import TabNavigation from './src/navigation/TabNavigation/TabNavigation';
 
 import StatusBarBackground from './src/subcomponents/StatusBarBackground/StatusBarBackground';
 
+import Colours from './src/utils/Colours';
+
 export default class App extends React.Component {
 
     state = {
@@ -68,7 +70,7 @@ export default class App extends React.Component {
                 { Platform.OS === 'ios' && 
                   <StatusBarBackground style = { 
                     {
-                      backgroundColor : '#3498db'
+                        backgroundColor : Colours.HEX_COLOURS.DARK_WHITE
                     }
                   } />
                 }
