@@ -14,7 +14,7 @@ import { genericErrorAlert, notifyAngelErrorAlert } from '../../utils/genericAle
 import { generateAppleMapsUrl } from '../../utils/linkingUrls';
 
 import Network from '../../utils/Network';
-import GenericPopupDialog from '../../utils/GenericPopupDialog';
+import GenericPopupDialog from '../../subcomponents/GenericPopupDialog/GenericPopupDialog';
 import MapCallout from '../../subcomponents/MapCallout/MapCallout';
 
 import StaticKit from '../../objects/StaticKit';
