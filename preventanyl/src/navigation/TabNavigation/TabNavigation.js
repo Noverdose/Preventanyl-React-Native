@@ -42,12 +42,12 @@ const TabNavigation = TabNavigator (
             },
         },
     }, {
-          tabBarPosition: 'bottom',
-          animationEnabled: true,
-          tabBarOptions: {
-              activeTintColor : '#e91e63',
-              showIcon        : true,
-          },
+        tabBarPosition: 'bottom',
+        animationEnabled: true,
+        tabBarOptions: {
+            activeTintColor : '#e91e63',
+            showIcon        : true,
+        },
     }
 );
 
