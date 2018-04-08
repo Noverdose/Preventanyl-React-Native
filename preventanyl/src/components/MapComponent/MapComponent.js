@@ -208,8 +208,8 @@ export default class MapComponent extends Component {
 
         } catch (error) {
 
-            console.warn (error);
-            genericErrorDescriptionAlert (error);
+            console.warn ("ERROR", error);
+            // genericErrorAlert (error);
 
         } finally {
 

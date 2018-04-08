@@ -13,15 +13,15 @@ const TabNavigation = TabNavigator (
                 tabBarLabel : 'Home',
                 tabBarIcon  : ( { tintColor } ) => (
                     <Image 
-                      source = { require ('../../../assets/map.imageset/map.png') }
-                      style  = { 
-                          [ 
-                              styles.icon, 
-                              { 
-                                  tintColor : tintColor 
-                              } 
-                          ] 
-                      } />
+                        source = { require ('../../../assets/map.imageset/map.png') }
+                        style  = { 
+                            [ 
+                                styles.icon, 
+                                { 
+                                    tintColor : tintColor 
+                                } 
+                            ] 
+                        } />
                 )
             },
         },

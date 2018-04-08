@@ -29,7 +29,8 @@ export default class MapCallout extends Component {
             return (
                 <MapView.Callout>
                     <Text style = { styles.headerText } >{ this.props.title }</Text>
-                    <Text>{ wordWrap (this.props.description, 50) } </Text>
+                    { <Text>{ wordWrap (this.props.description, 50) } </Text> }
+                    { /* <Text>{ this.props.description }</Text> */ }
                     <TouchableOpacity onPress = { () => {
                         let url = this.props.url;
                         
