@@ -10,11 +10,12 @@ import PreventanylNotifications from '../../pushnotifications/PreventanylNotific
 import { convertLocationToLatitudeLongitude, getCurrentLocation, getCurrentLocationAsync, setupLocation } from '../../utils/location';
 import { formatDateTime, compareDiffHoursNow, getMomentNow, getMomentNowSubtractHours } from '../../utils/localTimeHelper';
 import { formatAddressObjectForMarker } from '../../utils/strings';
-import { genericErrorAlert, notifyAngelErrorAlert } from '../../utils/genericAlerts';
+import { genericErrorAlert, genericDisclaimerAlert, notifyAngelErrorAlert } from '../../utils/genericAlerts';
 import { generateAppleMapsUrl } from '../../utils/linkingUrls';
 
 import Network from '../../utils/Network';
 import Colours from '../../utils/Colours';
+import Storage from '../../utils/Storage';
 import GenericPopupDialog from '../../subcomponents/GenericPopupDialog/GenericPopupDialog';
 import MapCallout from '../../subcomponents/MapCallout/MapCallout';
 
@@ -97,6 +98,28 @@ export default class MapComponent extends Component {
 
     async componentDidMount () {
         this.mounted = true;
+
+        // If in future, add multiple disclaimer values, 
+        // adjust code to see all options in Storage values object.
+        Storage.getDisclaimerData ( (data) => 
+            {
+                console.log ("DATA", data);
+            }, (error) => {
+                genericDisclaimerAlert ( () => 
+                    {
+                        Storage.setDisclaimerData (Storage.values.DISCLAIMER.VALID.ACCEPTED, () => 
+                            {
+                                console.log (Storage.values.DISCLAIMER.VALID.ACCEPTED);
+                            }
+                        ,(error) => 
+                            {
+                                console.log ("ERROR", error);
+                            }
+                        )
+                    }
+                )
+            }
+        )
 
         this.setState (
             {
