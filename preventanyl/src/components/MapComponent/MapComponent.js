@@ -177,7 +177,7 @@ export default class MapComponent extends Component {
 
                 staticKits = kits.map ( (kit) => 
                     {
-                        return StaticKit.generateOverdoseFromSnapshot (kit);
+                        return StaticKit.generateStaticKitFromSnapshot (kit);
                     }
                 )
                     
