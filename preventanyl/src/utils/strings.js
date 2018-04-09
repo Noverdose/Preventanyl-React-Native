@@ -54,7 +54,7 @@ export const splitString = (str, splitNumber, splitChar) => {
 
     splitStr = str.match (regularExpression);
 
-    return splitStr.join (splitChar);
+    return (splitStr) ? splitStr.join (splitChar) : str;
 
 }
 
