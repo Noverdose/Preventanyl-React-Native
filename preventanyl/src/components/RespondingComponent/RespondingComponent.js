@@ -5,17 +5,17 @@ import Links from '../../utils/Links';
 
 import WebPage from '../../subcomponents/WebPage/WebPage';
 
-export default class SupportUsComponent extends Component {
+export default class RespondingComponent extends Component {
 
     render () {
 
         return (
             <WebPage
-                url = { Links.urls.PAYPAL_ME } />
-        );
-
+                url = { Links.urls.OVERDOSE_RESPONSE } />
+        )
+        
     }
 
 }
 
-AppRegistry.registerComponent ('SupportUsComponent', () => SupportUsComponent);
+AppRegistry.registerComponent ('RespondingComponent', () => RespondingComponent);

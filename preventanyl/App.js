@@ -7,11 +7,14 @@ import TabNavigation from './src/navigation/TabNavigation/TabNavigation';
 
 import StatusBarBackground from './src/subcomponents/StatusBarBackground/StatusBarBackground';
 
+import Colours from './src/utils/Colours';
+
 export default class App extends React.Component {
 
     state = {
         isReady  : false,
-        appState : AppState.currentState
+        appState : AppState.currentState,
+        statusBarColour : Colours.HEX_COLOURS.DARK_WHITE
     };
 
     static pauseFuncs  = [];
@@ -28,14 +31,18 @@ export default class App extends React.Component {
     _handleAppStateChange = (nextAppState) => {
         if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
             console.log('App has come to the foreground!')
-            App.resumeFuncs.map ( func => {
-                func ();
-            })
+            App.resumeFuncs.map ( func => 
+                {
+                    func ();
+                }
+            )
         } else {
             console.log('App has gone to the background!')
-            App.pauseFuncs.map ( func => {
-                func ();
-            })
+            App.pauseFuncs.map ( func => 
+                {
+                    func ();
+                }
+            )
         }
 
         this.setState (
@@ -68,7 +75,7 @@ export default class App extends React.Component {
                 { Platform.OS === 'ios' && 
                   <StatusBarBackground style = { 
                     {
-                      backgroundColor : '#3498db'
+                        backgroundColor : this.state.statusBarColour
                     }
                   } />
                 }
