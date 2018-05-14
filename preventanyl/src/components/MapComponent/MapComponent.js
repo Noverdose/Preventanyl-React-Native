@@ -10,22 +10,37 @@ import PreventanylNotifications from '../../pushnotifications/PreventanylNotific
 import { convertLocationToLatitudeLongitude, getCurrentLocation, getCurrentLocationAsync, setupLocation } from '../../utils/location';
 import { formatDateTime, compareDiffHoursNow, getMomentNow, getMomentNowSubtractHours } from '../../utils/localTimeHelper';
 import { formatAddressObjectForMarker } from '../../utils/strings';
-import { genericErrorAlert, genericDisclaimerAlert, notifyAngelErrorAlert } from '../../utils/genericAlerts';
+import { genericErrorAlert, genericDisclaimerAlert, notifyHelpErrorAlert } from '../../utils/genericAlerts';
 import { generateAppleMapsUrl } from '../../utils/linkingUrls';
 
 import Network from '../../utils/Network';
 import Colours from '../../utils/Colours';
 import Storage from '../../utils/Storage';
-import GenericPopupDialog from '../../subcomponents/GenericPopupDialog/GenericPopupDialog';
+
+import GenericNativeDialog from '../../subcomponents/GenericNativeDialog/GenericNativeDialog';
 import MapCallout from '../../subcomponents/MapCallout/MapCallout';
 
 import StaticKit from '../../objects/StaticKit';
 
 import App from '../../../App';
 
-const notifyTitle                  = "Notify Angels";
+const notifyTitle                  = "Notify Help";
+
 const HELP_COOL_DOWN               = 0.166667;
 const HELP_COOL_DOWN_ERROR_MESSAGE = `Please wait ${ Math.round (HELP_COOL_DOWN * 60) } minutes before asking for help again`;
+
+const USER_POSITION_TITLE          = "Current position";
+const USER_POSITION_MESSAGE        = "You are here";
+
+const HELP_ME_BUTTON_TITLE         = "Help Me"
+
+const SPINNER_MESSAGE              = "Loading...";
+
+
+/*
+    Declerations to use shorthand by removing . when using subcomponents
+*/
+const Marker = MapView.Marker;
 
 export default class MapComponent extends Component {
 
@@ -46,7 +61,7 @@ export default class MapComponent extends Component {
                 error : null,
             },
             isLoading       : false,
-            notifyMessage   : 'Notifying in 5 seconds',
+            notifyMessage   : '5', // 'Notifying in 5 seconds',
             notifySeconds   : 5,
             notifyTimer     : null,
             notifyTimestamp : getMomentNowSubtractHours (2)
@@ -85,9 +100,9 @@ export default class MapComponent extends Component {
             ),
             { 
                 enableHighAccuracy : true,
-                timeout : 20000,
-                maximumAge : 1000,
-                distanceFilter : 10
+                timeout            : 20000,
+                maximumAge         : 1000,
+                distanceFilter     : 10
             }
         );
     }
@@ -320,7 +335,8 @@ export default class MapComponent extends Component {
         this.setState (
             {
                 notifySeconds : 5,
-                notifyMessage : `Notifying in ${ this.state.notifySeconds } seconds`
+                notifyMessage : this.state.notifySeconds.toString ()
+                // notifyMessage : `Notifying in ${ this.state.notifySeconds } seconds`
             }
         )
        
@@ -331,36 +347,37 @@ export default class MapComponent extends Component {
         this.resetHelpTimer ();
 
         if (!Network.connectionObject.connected) {
-            notifyAngelErrorAlert ();
+            notifyHelpErrorAlert ();
             return;
         }
 
-        console.log (compareDiffHoursNow (this.state.notifyTimestamp));
+        // console.log (compareDiffHoursNow (this.state.notifyTimestamp));
 
         if (compareDiffHoursNow (this.state.notifyTimestamp) < HELP_COOL_DOWN) {
             genericErrorAlert (HELP_COOL_DOWN_ERROR_MESSAGE);
             return;
         }
 
-        this.popupDialog.show();
+        this.nativeDialog.show ();
 
         let notifyTimer = setInterval (() => {
             if (this.state.notifySeconds > 0)
                 this.setState (
                     {
                         notifySeconds : this.state.notifySeconds - 1,
-                        notifyMessage : `Notifying in ${ this.state.notifySeconds } seconds`
+                        // notifyMessage : `Notifying in ${ this.state.notifySeconds } seconds`
+                        notifyMessage : this.state.notifySeconds.toString ()
                     }
                 )
             else {
                 console.log ("TIME IS ZERO");
-                this.notfiyAngelsWithUpdates ();
+                this.notfiyHelpWithUpdates ();
             }
         }, 1000);
 
         this.setState (
             {
-                notifyTimer     : notifyTimer,
+                notifyTimer : notifyTimer,
             }
         )
         
@@ -385,10 +402,12 @@ export default class MapComponent extends Component {
 
     }
 
-    notfiyAngelsWithUpdates () {
-        console.log ("Notifying Angels");
+    notfiyHelpWithUpdates () {
+        console.log ("Notifying Help");
+
         this.resetHelpTimer ();
-        PreventanylNotifications.notifyAngels ( () => 
+
+        PreventanylNotifications.notifyHelp ( () => 
             {
 
                 this.setState (
@@ -402,7 +421,7 @@ export default class MapComponent extends Component {
             }
         );
 
-        this.popupDialog.dismiss ();
+        this.nativeDialog.dismiss ();
     }
 
     render () {
@@ -411,36 +430,32 @@ export default class MapComponent extends Component {
 
                 <Spinner
                     visible = { this.state.isLoading }
-                    textContent = { "Loading..." }
+                    textContent = { SPINNER_MESSAGE }
                     textStyle = {
                         { color : '#FFF' }
                     }
                     cancelable = { false } />
-
-                {/* <PopupDialog
-                    ref = { (popupDialog) => { this.popupDialog = popupDialog; }} >
-                    <View>
-                        <Text>{ this.state.notifyTitle }</Text>
-                    </View>
-                </PopupDialog> */}
                 
-                <GenericPopupDialog 
-                    title = { notifyTitle } 
+                <GenericNativeDialog
+                    title   = { notifyTitle } 
                     message = { this.state.notifyMessage } 
-                    ref = { (popupDialog) => { this.popupDialog = popupDialog; } } 
-                    actionButtonText = "Notify Angels"
+                    actionButtonText = { notifyTitle }
                     cancelFunction = { () => 
                         {
-                            console.log ("Cancelling Popup")
                             this.resetHelpTimer ();
                         }
                     }
                     actionFunction = { () => 
                         { 
-                            console.log ("Notifying Angels");
-                            this.notfiyAngelsWithUpdates ();
+                            this.notfiyHelpWithUpdates ();
                         }
-                    } />
+                    }
+                    ref = { 
+                        (nativeDialog) => { 
+                            this.nativeDialog = nativeDialog; 
+                        } 
+                    }
+                />
 
                 <MapView 
                     style = { styles.map }
@@ -463,17 +478,17 @@ export default class MapComponent extends Component {
                     </TouchableOpacity>
 
                     { this.state.userLocation.latlng.latitude != null && this.state.userLocation.latlng.longitude != null &&
-                        <MapView.Marker 
+                        <Marker 
                             coordinate  = { this.state.userLocation.latlng } 
-                            title       = "Current position"
-                            description = "You are here"
+                            title       = { USER_POSITION_TITLE }
+                            description = { USER_POSITION_MESSAGE }
                             pinColor    = { Colours.HEX_COLOURS.BLACK } />
                     }
 
                     {
                         this.state.staticKits.length > 0 &&
                         this.state.staticKits.map ((marker, index) => (
-                            <MapView.Marker
+                            <Marker
                                 key         = { index }
                                 coordinate  = { marker.latlng }
                                 title       = { marker.title }
@@ -484,7 +499,7 @@ export default class MapComponent extends Component {
                                     description = { marker.formattedDescription }
                                     url = { generateAppleMapsUrl ( this.state.userLocation.latlng, marker.latlng ) } />
                                 
-                            </MapView.Marker>
+                            </Marker>
                         ))
                     }
 
@@ -494,7 +509,7 @@ export default class MapComponent extends Component {
                     style = { styles.helpMeBtn }
                     onPress = { this.helpMe.bind (this) }
                     underlayColor = '#fff'>
-                    <Text style = { styles.helpMeText }>Help Me</Text>
+                    <Text style = { styles.helpMeText }>{ HELP_ME_BUTTON_TITLE }</Text>
                 </TouchableOpacity>
                 
             </View>
@@ -507,7 +522,7 @@ const styles = StyleSheet.create ({
     container : {
         flex : 1,
         backgroundColor : '#F5FCFF',
-        flexDirection : 'column',
+        flexDirection   : 'column',
     },
     map : {
         flex : 12,
@@ -517,12 +532,12 @@ const styles = StyleSheet.create ({
         backgroundColor : '#8b0000',
     },
     helpMeText : {
-        color:'#fff',
-        textAlign:'center',
-        fontWeight: 'bold',
-        paddingLeft : 10,
-        paddingRight : 10,
-        paddingTop : 10,
+        color         : '#fff',
+        textAlign     : 'center',
+        fontWeight    : 'bold',
+        paddingLeft   : 10,
+        paddingRight  : 10,
+        paddingTop    : 10,
         paddingBottom : 10
     }
 })

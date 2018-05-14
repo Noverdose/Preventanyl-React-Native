@@ -20,12 +20,12 @@ export default class App extends React.Component {
     static pauseFuncs  = [];
     static resumeFuncs = [];
 
-    componentDidMount() {
-      AppState.addEventListener('change', this._handleAppStateChange);
+    componentDidMount () {
+        AppState.addEventListener ('change', this._handleAppStateChange);
     }
 
-    componentWillUnmount() {
-        AppState.removeEventListener('change', this._handleAppStateChange);
+    componentWillUnmount () {
+        AppState.removeEventListener ('change', this._handleAppStateChange);
     }
 
     _handleAppStateChange = (nextAppState) => {
@@ -103,11 +103,13 @@ export default class App extends React.Component {
 
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff'
-  },
-})
+const styles = StyleSheet.create (
+    {
+        container: {
+            flex: 1,
+            backgroundColor: '#fff'
+        },
+    }
+)
 
 AppRegistry.registerComponent ('App', () => App);

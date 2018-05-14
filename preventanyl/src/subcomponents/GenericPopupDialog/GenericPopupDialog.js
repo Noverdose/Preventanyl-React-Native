@@ -30,7 +30,7 @@ export default class GenericPopupDialog extends Component {
                 <PopupDialog
                     dialogTitle = { <DialogTitle title = { this.props.title } /> }
                     ref = { (popupDialog) => { this.popupDialog = popupDialog; }} 
-                    width = { DIALOG_WIDTH }
+                    width  = { DIALOG_WIDTH }
                     height = { DIALOG_HEIGHT }
                     dismissOnTouchOutside = { DISMISS_TOUCH_OUTSIDE }
                     actions = { [
@@ -59,7 +59,7 @@ export default class GenericPopupDialog extends Component {
                 height = { DIALOG_HEIGHT }
                 dismissOnTouchOutside = { DISMISS_TOUCH_OUTSIDE }
                 actions = { [
-                    <DialogButton key = { 1 } text = { DIALOG_LEFT_BUTTON_TEXT } align = "left" onPress = { () => this.popupDialog.dismiss() } />,
+                    <DialogButton key = { 1 } text = { DIALOG_LEFT_BUTTON_TEXT } align = "left" onPress = { () => this.popupDialog.dismiss () } />,
                     <DialogButton key = { 2 } text = { this.props.actionButtonText } align = "right" onPress = { () => this.props.actionFunction () } />,
                     ] } >
                 <View>
