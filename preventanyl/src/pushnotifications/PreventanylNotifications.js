@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { genericErrorAlert, notifyAngelAlert, notifyAngelErrorAlert, notifyAngelErrorAlertUnknown } from '../utils/genericAlerts';
+import { genericErrorAlert, notifyHelpAlert, notifyHelpErrorAlert, notifyHelpErrorAlertUnknown } from '../utils/genericAlerts';
 
 import { getCurrentLocation, convertLocationToLatitudeLongitude } from '../utils/location';
 
@@ -11,10 +11,10 @@ import Overdose from '../objects/Overdose';
 
 export default class PreventanylNotifications {
 
-    static notifyAngels = async (successCallback, failureCallback) => {
+    static notifyHelp = async (successCallback, failureCallback) => {
 
         if (!Network.connectionObject.connected) {
-            notifyAngelErrorAlert ();
+            notifyHelpErrorAlert ();
             failureCallback (new Error (Network.errorMessages.NO_INTERNET_CONNECTION));
             return;
         }
@@ -32,7 +32,7 @@ export default class PreventanylNotifications {
             
             console.log (url);
 
-            notifyAngelAlert ();
+            notifyHelpAlert ();
 
             // No need to send location result back as it is not useful information
             successCallback ();
@@ -41,7 +41,7 @@ export default class PreventanylNotifications {
             {
                 console.log (error);
                 failureCallback (error);
-                notifyAngelErrorAlertUnknown ();
+                notifyHelpErrorAlertUnknown ();
             }
         )      
        

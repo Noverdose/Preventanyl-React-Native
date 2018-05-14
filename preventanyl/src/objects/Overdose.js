@@ -26,7 +26,7 @@ export default class Overdose {
     } 
     
     static generateOverdose (region, reportedTime, coordinates) {
-        id = Overdose.generateId(reportedTime, coordinates.latitude, coordinates.longitude)
+        id = Overdose.generateId (reportedTime, coordinates.latitude, coordinates.longitude)
         return new Overdose (id, Date.now(), coordinates, region, reportedTime, false)
     }
 
